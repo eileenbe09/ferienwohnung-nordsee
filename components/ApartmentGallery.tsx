@@ -2,149 +2,105 @@
 
 import { useEffect, useState } from "react";
 
-type ApartmentGalleryProps = {
-  images: string[];
-  name: string;
-};
+type Props = { images: string[]; name: string };
 
-export default function ApartmentGallery({
-  images,
-  name,
-}: ApartmentGalleryProps) {
+export default function ApartmentGallery({ images, name }: Props) {
   const safeImages = images.length > 0 ? images : ["/images/hero1.avif"];
-
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const activeImage = safeImages[activeIndex];
+  const active = safeImages[activeIndex];
 
-  function goToPrevious() {
-    setActiveIndex((prev) => (prev === 0 ? safeImages.length - 1 : prev - 1));
-  }
-
-  function goToNext() {
-    setActiveIndex((prev) => (prev === safeImages.length - 1 ? 0 : prev + 1));
-  }
+  const prev = () =>
+    setActiveIndex((i) => (i === 0 ? safeImages.length - 1 : i - 1));
+  const next = () =>
+    setActiveIndex((i) => (i === safeImages.length - 1 ? 0 : i + 1));
 
   useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (!isLightboxOpen) return;
-
-      if (event.key === "Escape") {
-        setIsLightboxOpen(false);
-      }
-
-      if (event.key === "ArrowLeft") {
-        goToPrevious();
-      }
-
-      if (event.key === "ArrowRight") {
-        goToNext();
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLightboxOpen, safeImages.length]);
+    if (!lightboxOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightboxOpen, safeImages.length]);
 
   return (
     <>
-      <div>
-        <div className="relative overflow-hidden rounded-[2rem] bg-white shadow-2xl">
-          <button
-            type="button"
-            onClick={() => setIsLightboxOpen(true)}
-            className="block w-full text-left"
-            aria-label={`${name} Bild groß anzeigen`}
-          >
-            <div
-              className="h-[280px] w-full bg-cover bg-center sm:h-[380px] lg:h-[500px]"
-              style={{ backgroundImage: `url('${activeImage}')` }}
-            />
-          </button>
-
-          {safeImages.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={goToPrevious}
-                className="absolute left-4 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white backdrop-blur-sm transition hover:bg-black/50 md:flex"
-                aria-label="Vorheriges Bild"
-              >
-                ‹
-              </button>
-
-              <button
-                type="button"
-                onClick={goToNext}
-                className="absolute right-4 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white backdrop-blur-sm transition hover:bg-black/50 md:flex"
-                aria-label="Nächstes Bild"
-              >
-                ›
-              </button>
-            </>
-          )}
-
-          <div className="absolute bottom-4 right-4 rounded-full bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-            {activeIndex + 1} / {safeImages.length}
-          </div>
-        </div>
+      {/* Hauptbild */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-stone-100 shadow-xl">
+        <button
+          type="button"
+          onClick={() => setLightboxOpen(true)}
+          className="block w-full"
+          aria-label="Bild vergrößern"
+        >
+          <div
+            className="h-[320px] w-full bg-cover bg-center sm:h-[420px] lg:h-[500px]"
+            style={{ backgroundImage: `url('${active}')` }}
+          />
+        </button>
 
         {safeImages.length > 1 && (
-          <div className="mt-3 flex items-center justify-center gap-3 md:hidden">
+          <>
             <button
               type="button"
-              onClick={goToPrevious}
-              className="flex h-11 min-w-[110px] items-center justify-center rounded-full bg-[#66735f] px-4 text-lg text-white transition active:scale-95"
-              aria-label="Vorheriges Bild"
+              onClick={prev}
+              className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white backdrop-blur-sm transition hover:bg-black/55"
+              aria-label="Zurück"
             >
               ‹
             </button>
-
             <button
               type="button"
-              onClick={goToNext}
-              className="flex h-11 min-w-[110px] items-center justify-center rounded-full bg-[#66735f] px-4 text-lg text-white transition active:scale-95"
-              aria-label="Nächstes Bild"
+              onClick={next}
+              className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white backdrop-blur-sm transition hover:bg-black/55"
+              aria-label="Weiter"
             >
               ›
             </button>
-          </div>
+          </>
         )}
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
-          {safeImages.map((image, index) => {
-            const isActive = index === activeIndex;
-
-            return (
-              <button
-                key={`${image}-${index}`}
-                type="button"
-                onClick={() => setActiveIndex(index)}
-                className={`overflow-hidden rounded-2xl border transition ${
-                  isActive
-                    ? "border-[#66735f] ring-2 ring-[#66735f]/25"
-                    : "border-white/30 hover:border-[#d8c7af]"
-                }`}
-                aria-label={`Bild ${index + 1} auswählen`}
-              >
-                <div
-                  className="h-24 w-full bg-cover bg-center sm:h-28"
-                  style={{ backgroundImage: `url('${image}')` }}
-                />
-              </button>
-            );
-          })}
+        <div className="absolute bottom-3 right-4 rounded-full bg-black/40 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+          {activeIndex + 1} / {safeImages.length}
         </div>
       </div>
 
-      {isLightboxOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 px-4 py-6">
+      {/* Thumbnails – kompakt */}
+      {safeImages.length > 1 && (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {safeImages.map((img, i) => (
+            <button
+              key={`${img}-${i}`}
+              type="button"
+              onClick={() => setActiveIndex(i)}
+              className={`shrink-0 overflow-hidden rounded-xl border-2 transition ${
+                i === activeIndex
+                  ? "border-[#66735f] opacity-100"
+                  : "border-transparent opacity-60 hover:opacity-90"
+              }`}
+              aria-label={`Bild ${i + 1}`}
+            >
+              <div
+                className="h-14 w-20 bg-cover bg-center"
+                style={{ backgroundImage: `url('${img}')` }}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90 px-4">
           <button
             type="button"
-            onClick={() => setIsLightboxOpen(false)}
-            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white backdrop-blur-sm transition hover:bg-white/20"
-            aria-label="Lightbox schließen"
+            onClick={() => setLightboxOpen(false)}
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-2xl text-white hover:bg-white/25"
+            aria-label="Schließen"
           >
             ×
           </button>
@@ -153,38 +109,29 @@ export default function ApartmentGallery({
             <>
               <button
                 type="button"
-                onClick={goToPrevious}
-                className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl text-white backdrop-blur-sm transition hover:bg-white/20 sm:left-6"
-                aria-label="Vorheriges Bild"
+                onClick={prev}
+                className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl text-white hover:bg-white/25"
               >
                 ‹
               </button>
-
               <button
                 type="button"
-                onClick={goToNext}
-                className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl text-white backdrop-blur-sm transition hover:bg-white/20 sm:right-6"
-                aria-label="Nächstes Bild"
+                onClick={next}
+                className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl text-white hover:bg-white/25"
               >
                 ›
               </button>
             </>
           )}
 
-          <div className="w-full max-w-6xl">
-            <div className="overflow-hidden rounded-[2rem] bg-white/5 shadow-2xl backdrop-blur-sm">
-              <div
-                className="h-[55vh] w-full bg-contain bg-center bg-no-repeat sm:h-[70vh]"
-                style={{ backgroundImage: `url('${activeImage}')` }}
-              />
-            </div>
-
-            <div className="mt-4 flex items-center justify-between text-sm text-white/85">
-              <span>{name}</span>
-              <span>
-                {activeIndex + 1} / {safeImages.length}
-              </span>
-            </div>
+          <div className="w-full max-w-5xl">
+            <div
+              className="h-[65vh] w-full rounded-2xl bg-contain bg-center bg-no-repeat"
+              style={{ backgroundImage: `url('${active}')` }}
+            />
+            <p className="mt-3 text-center text-sm text-white/60">
+              {name} · {activeIndex + 1} / {safeImages.length}
+            </p>
           </div>
         </div>
       )}

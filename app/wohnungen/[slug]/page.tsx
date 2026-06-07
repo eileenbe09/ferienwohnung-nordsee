@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import ApartmentGallery from "@/components/ApartmentGallery";
+import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { apartments as staticApartments } from "@/data/apartments";
@@ -248,6 +249,13 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
               </p>
             </div>
           </div>
+
+          {/* Kalender */}
+          {staticApt && (
+            <div className="mt-8">
+              <AvailabilityCalendar prices={staticApt.prices} slug={slug} />
+            </div>
+          )}
 
           {/* CTA */}
           <div className="mt-12 rounded-[2rem] bg-[#1f1c19] p-8 text-center text-white sm:p-10">

@@ -7,9 +7,9 @@ export const apartments = [
       "Ruhige, kinderfreundliche Ferienwohnung in Altfunnixsiel mit Terrasse, Spielwiese und zwei Schlafzimmern.",
     guests: "2 Erwachsene, 2 Kinder + 1 Kleinkind bis 3 Jahre",
     size: 60,
-    image: "/images/wohnung-1.avif",
+    image: "/images/fewo1.1.avif",
     gallery: [
-      "/images/wohnung-1.avif",
+      "/images/fewo1.1.avif",
       "/images/fewo1.2.avif",
       "/images/fewo1.3.avif",
       "/images/fewo1.4.avif",
@@ -63,9 +63,9 @@ export const apartments = [
       "Kinderfreundliche Ferienwohnung in ruhiger Feldrandlage mit kleinem Gartenstück und voll ausgestatteter Küche.",
     guests: "2 Erwachsene, 2 Kinder + 1 Kleinkind bis 3 Jahre",
     size: 60,
-    image: "/images/wohnung-2.avif",
+    image: "/images/fewo2.avif",
     gallery: [
-      "/images/wohnung-2.avif",
+      "/images/fewo2.avif",
       "/images/fewo2.2.avif",
       "/images/fewo2.3.avif",
       "/images/fewo2.4.avif",
