@@ -127,20 +127,18 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
 
       {/* INHALT */}
       <div className="bg-[#f7f3ec]">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
 
-          {/* Beschreibung + Info-Kacheln */}
-          <div className="grid gap-10 lg:grid-cols-[1fr_380px] lg:items-start">
+          {/* Galerie – volle Breite */}
+          <ApartmentGallery images={galleryImages} name={name} />
+
+          {/* Beschreibung + Sidebar */}
+          <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-[#66735f]">
                 Über diese Wohnung
               </p>
               <p className="mt-4 text-lg leading-8 text-stone-600">{description}</p>
-
-              {/* Galerie */}
-              <div className="mt-10">
-                <ApartmentGallery images={galleryImages} name={name} />
-              </div>
             </div>
 
             {/* Sidebar */}

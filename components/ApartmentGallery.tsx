@@ -38,7 +38,7 @@ export default function ApartmentGallery({ images, name }: Props) {
           aria-label="Bild vergrößern"
         >
           <div
-            className="h-[320px] w-full bg-cover bg-center sm:h-[420px] lg:h-[500px]"
+            className="h-[260px] w-full bg-cover bg-center sm:h-[360px] lg:h-[420px]"
             style={{ backgroundImage: `url('${active}')` }}
           />
         </button>
