@@ -139,6 +139,22 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                 Über diese Wohnung
               </p>
               <p className="mt-4 text-lg leading-8 text-stone-600">{description}</p>
+
+              {/* Ausstattung direkt unter Beschreibung */}
+              <div className="mt-8 rounded-[2rem] bg-white p-6 shadow-xl sm:p-8">
+                <h2 className="font-serif text-2xl text-[#1f1c19]">Ausstattung</h2>
+                <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {features.map((f) => (
+                    <div
+                      key={f.id}
+                      className="flex items-center gap-2 rounded-xl bg-[#f7f3ec] px-3 py-2.5 text-sm text-stone-700"
+                    >
+                      <span className="text-[#66735f]">✓</span>
+                      {f.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Sidebar */}
@@ -196,25 +212,8 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
             </aside>
           </div>
 
-          {/* Ausstattung + Preise */}
-          <div className="mt-16 grid gap-8 lg:grid-cols-2">
-            {/* Ausstattung */}
-            <div className="rounded-[2rem] bg-white p-6 shadow-xl sm:p-8">
-              <h2 className="font-serif text-2xl text-[#1f1c19]">Ausstattung</h2>
-              <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {features.map((f) => (
-                  <div
-                    key={f.id}
-                    className="flex items-center gap-2 rounded-xl bg-[#f7f3ec] px-3 py-2.5 text-sm text-stone-700"
-                  >
-                    <span className="text-[#66735f]">✓</span>
-                    {f.label}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Preise */}
+          {/* Preise */}
+          <div className="mt-8">
             <div className="rounded-[2rem] bg-white p-6 shadow-xl sm:p-8">
               <h2 className="font-serif text-2xl text-[#1f1c19]">Preise 2026</h2>
               <div className="mt-6 overflow-hidden rounded-2xl border border-stone-100">
@@ -249,6 +248,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
           </div>
 
           {/* Kalender */}
+
           {staticApt && (
             <div className="mt-8">
               <AvailabilityCalendar prices={staticApt.prices} slug={slug} />
