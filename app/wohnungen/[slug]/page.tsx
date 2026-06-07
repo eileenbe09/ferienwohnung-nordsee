@@ -277,8 +277,8 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
 
           {(imagesError || apartmentError) && (
             <div className="mt-6 rounded-2xl bg-red-100 p-4 text-red-700">
-              {imagesError && <p>Fehler Bilder: {imagesError.message}</p>}
-              {apartmentError && <p>Fehler Wohnung: {apartmentError.message}</p>}
+              {imagesError && <p>Fehler Bilder: {(imagesError as Error).message}</p>}
+              {apartmentError && <p>Fehler Wohnung: {(apartmentError as Error).message}</p>}
             </div>
           )}
         </section>
