@@ -31,8 +31,21 @@ export default async function Home() {
     <>
       {/* ── HERO ──────────────────────────────────────────────── */}
       <main className="relative min-h-screen overflow-hidden text-white">
+        {/* Video-Hintergrund – lege die Datei unter public/videos/hero.mp4 ab */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover scale-105"
+          poster="/images/hero.avif"
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+          {/* Fallback wenn kein Video vorhanden */}
+        </video>
+        {/* Fallback-Bild (sichtbar solange kein Video geladen) */}
         <div
-          className="absolute inset-0 bg-cover bg-center scale-105"
+          className="absolute inset-0 bg-cover bg-center scale-105 -z-10"
           style={{ backgroundImage: "url('/images/hero.avif')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
