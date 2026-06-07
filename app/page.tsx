@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 type ApartmentRow = {
   id: number;
@@ -35,6 +37,7 @@ export default async function Home() {
   const typedApartments = (apartments ?? []) as ApartmentRow[];
 
   return (
+    <>
     <main className="relative min-h-screen overflow-hidden text-white">
       <div
         className="fixed inset-0 bg-cover bg-center"
@@ -43,40 +46,7 @@ export default async function Home() {
       <div className="fixed inset-0 bg-black/20" />
 
       <div className="relative z-10">
-        <header className="px-4 pt-4 sm:px-6">
-          <div className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/20 bg-black/20 px-4 py-3 backdrop-blur-md sm:px-6">
-            <Link
-              href="/"
-              className="text-sm font-semibold tracking-[0.18em] text-white sm:text-base"
-            >
-              NORDSEE FERIENWOHNUNGEN
-            </Link>
-
-            <nav className="hidden items-center gap-6 md:flex">
-              <Link href="/" className="text-sm text-white/90 hover:text-white">
-                Start
-              </Link>
-              <Link
-                href="/wohnungen"
-                className="text-sm text-white/90 hover:text-white"
-              >
-                Wohnungen
-              </Link>
-              <Link
-                href="/anfrage"
-                className="text-sm text-white/90 hover:text-white"
-              >
-                Anfrage
-              </Link>
-              <Link
-                href="/kontakt"
-                className="text-sm text-white/90 hover:text-white"
-              >
-                Kontakt
-              </Link>
-            </nav>
-          </div>
-        </header>
+        <Navbar transparent />
 
         <section className="px-4 pb-14 pt-10 sm:px-6 sm:pt-14 lg:pt-20">
           <div className="mx-auto grid max-w-6xl items-end gap-8 lg:grid-cols-[1.15fr_0.85fr]">
@@ -217,25 +187,49 @@ export default async function Home() {
           </div>
         </section>
 
+        <section className="px-4 pb-10 sm:px-6 sm:pb-14">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { icon: "🌊", label: "Strand", value: "Ca. 5 km" },
+                { icon: "🏠", label: "Wohnungen", value: "2 Ferienwohnungen" },
+                { icon: "👨‍👩‍👧‍👦", label: "Ideal für", value: "Familien" },
+                { icon: "🐾", label: "Haustiere", value: "Nicht erlaubt" },
+              ].map(({ icon, label, value }) => (
+                <div
+                  key={label}
+                  className="rounded-[2rem] border border-white/20 bg-black/25 p-5 backdrop-blur-md"
+                >
+                  <span className="text-2xl">{icon}</span>
+                  <p className="mt-3 text-xs uppercase tracking-[0.2em] text-white/60">
+                    {label}
+                  </p>
+                  <p className="mt-1 font-semibold">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="px-4 pb-14 sm:px-6 sm:pb-20">
           <div className="mx-auto max-w-6xl rounded-[2rem] border border-white/20 bg-black/25 p-6 text-white backdrop-blur-md sm:p-8 lg:p-10">
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-white/70">
-                  Nordseegefühl
+                  Dein nächster Urlaub
                 </p>
                 <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
-                  Natürlich, ruhig und hochwertig
+                  Ankommen. Durchatmen. Nordsee.
                 </h2>
-                <p className="mt-4 max-w-3xl leading-7 text-white/85">
-                  Ein warmes, zurückhaltendes Design mit Sandtönen, gedeckten
-                  Farben und klaren Formen – inspiriert vom gehobenen Sansibar-Stil.
+                <p className="mt-4 max-w-2xl leading-7 text-white/85">
+                  Ruhige Feldrandlage, familienfreundliche Ausstattung und das
+                  Meer zum Greifen nah – schreib uns einfach an.
                 </p>
               </div>
 
               <Link
                 href="/anfrage"
-                className="inline-flex items-center justify-center rounded-full bg-[#d8c7af] px-6 py-3 text-sm font-semibold text-[#1f1c19] transition hover:opacity-90"
+                className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#d8c7af] px-6 py-3 text-sm font-semibold text-[#1f1c19] transition hover:opacity-90"
               >
                 Jetzt Urlaub anfragen
               </Link>
@@ -244,5 +238,8 @@ export default async function Home() {
         </section>
       </div>
     </main>
+
+    <Footer />
+  </>
   );
 }

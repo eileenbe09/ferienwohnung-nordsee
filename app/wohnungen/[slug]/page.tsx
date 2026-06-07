@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import ApartmentGallery from "@/components/ApartmentGallery";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 type PageProps = {
   params: Promise<{
@@ -59,6 +61,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   }
 
   return (
+    <>
     <main className="relative min-h-screen overflow-hidden text-white">
       <div
         className="fixed inset-0 bg-cover bg-center"
@@ -69,40 +72,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
       <div className="fixed inset-0 bg-black/25" />
 
       <div className="relative z-10 px-4 pb-14 pt-4 sm:px-6 sm:pb-20">
-        <header className="mx-auto max-w-6xl">
-          <div className="flex items-center justify-between rounded-full border border-white/20 bg-black/20 px-4 py-3 backdrop-blur-md sm:px-6">
-            <Link
-              href="/"
-              className="text-sm font-semibold tracking-[0.18em] text-white sm:text-base"
-            >
-              NORDSEE FERIENWOHNUNGEN
-            </Link>
-
-            <nav className="hidden items-center gap-6 md:flex">
-              <Link href="/" className="text-sm text-white/90 hover:text-white">
-                Start
-              </Link>
-              <Link
-                href="/wohnungen"
-                className="text-sm text-white/90 hover:text-white"
-              >
-                Wohnungen
-              </Link>
-              <Link
-                href="/anfrage"
-                className="text-sm text-white/90 hover:text-white"
-              >
-                Anfrage
-              </Link>
-              <Link
-                href="/kontakt"
-                className="text-sm text-white/90 hover:text-white"
-              >
-                Kontakt
-              </Link>
-            </nav>
-          </div>
-        </header>
+        <Navbar transparent />
 
         <section className="mx-auto mt-10 max-w-6xl sm:mt-14 lg:mt-20">
           <div className="max-w-3xl">
@@ -284,5 +254,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
         </section>
       </div>
     </main>
+    <Footer />
+    </>
   );
 }
