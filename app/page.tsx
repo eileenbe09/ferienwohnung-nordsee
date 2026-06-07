@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -10,25 +11,15 @@ type ApartmentRow = {
   short_description: string | null;
   guests: string | null;
   size: number | null;
-  coverImage: {
-    image_url: string;
-  }[] | null;
+  coverImage: { image_url: string }[] | null;
 };
 
 export default async function Home() {
-  const { data: apartments, error } = await supabase
+  const { data: apartments } = await supabase
     .from("apartments")
     .select(`
-      id,
-      name,
-      slug,
-      short_description,
-      guests,
-      size,
-      coverImage:apartment_images!apartment_id (
-        image_url,
-        is_cover
-      )
+      id, name, slug, short_description, guests, size,
+      coverImage:apartment_images!apartment_id(image_url, is_cover)
     `)
     .eq("is_active", true)
     .eq("coverImage.is_cover", true)
@@ -38,208 +29,312 @@ export default async function Home() {
 
   return (
     <>
-    <main className="relative min-h-screen overflow-hidden text-white">
-      <div
-        className="fixed inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/hero.avif')" }}
-      />
-      <div className="fixed inset-0 bg-black/20" />
+      {/* ── HERO ──────────────────────────────────────────────── */}
+      <main className="relative min-h-screen overflow-hidden text-white">
+        <div
+          className="absolute inset-0 bg-cover bg-center scale-105"
+          style={{ backgroundImage: "url('/images/hero.avif')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
 
-      <div className="relative z-10">
-        <Navbar transparent />
+        <div className="relative z-10 flex min-h-screen flex-col">
+          <Navbar transparent />
 
-        <section className="px-4 pb-14 pt-10 sm:px-6 sm:pt-14 lg:pt-20">
-          <div className="mx-auto grid max-w-6xl items-end gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="max-w-3xl">
-              <p className="text-xs uppercase tracking-[0.38em] text-white/80 sm:text-sm">
-                Nordsee · Ruhe · Stil
-              </p>
+          <div className="flex flex-1 flex-col items-center justify-center px-4 pb-24 pt-10 text-center sm:px-6">
+            <p className="animate-fade-up text-xs uppercase tracking-[0.4em] text-[#d8c7af] sm:text-sm">
+              Altfunnixsiel · Nordsee · Niedersachsen
+            </p>
 
-              <h1 className="mt-4 text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-7xl">
-                Ferienwohnungen mit ruhigem Küstencharme
-              </h1>
+            <h1 className="animate-fade-up delay-100 mt-5 font-serif text-5xl font-normal italic leading-tight sm:text-6xl lg:text-8xl">
+              Wo die Seele<br />
+              <span className="not-italic font-semibold">durchatmet.</span>
+            </h1>
 
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/90 sm:text-lg sm:leading-8">
-                Zwei liebevoll eingerichtete Ferienwohnungen in Altfunnixsiel –
-                familienfreundlich, ruhig gelegen und nur etwa 5 km vom Strand in
-                Harlesiel und Carolinensiel entfernt.
-              </p>
+            <p className="animate-fade-up delay-200 mt-6 max-w-xl text-base leading-7 text-white/85 sm:text-lg">
+              Zwei liebevoll eingerichtete Ferienwohnungen in ruhiger Feldrandlage –
+              familienfreundlich, stilvoll und nur 5 km vom Strand entfernt.
+            </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Link
-                  href="/wohnungen"
-                  className="inline-flex items-center justify-center rounded-full bg-[#d8c7af] px-6 py-3 text-sm font-semibold text-[#1f1c19] transition hover:opacity-90"
-                >
-                  Wohnungen ansehen
-                </Link>
-
-                <Link
-                  href="/anfrage"
-                  className="inline-flex items-center justify-center rounded-full border border-white/70 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-[#1f1c19]"
-                >
-                  Direkt anfragen
-                </Link>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/20 bg-white/88 p-6 shadow-2xl backdrop-blur-md sm:p-8">
-              <p className="text-xs uppercase tracking-[0.3em] text-stone-500">
-                Auf einen Blick
-              </p>
-
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#f7f3ec] p-4">
-                  <p className="text-sm text-stone-500">Lage</p>
-                  <p className="mt-2 font-medium text-[#1f1c19]">Altfunnixsiel</p>
-                </div>
-
-                <div className="rounded-2xl bg-[#f7f3ec] p-4">
-                  <p className="text-sm text-stone-500">Entfernung Strand</p>
-                  <p className="mt-2 font-medium text-[#1f1c19]">ca. 5 km</p>
-                </div>
-
-                <div className="rounded-2xl bg-[#f7f3ec] p-4">
-                  <p className="text-sm text-stone-500">Wohnungen</p>
-                  <p className="mt-2 font-medium text-[#1f1c19]">
-                    Seerobbe &amp; Leuchtturm
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-[#f7f3ec] p-4">
-                  <p className="text-sm text-stone-500">Ideal für</p>
-                  <p className="mt-2 font-medium text-[#1f1c19]">
-                    Familien mit Kindern
-                  </p>
-                </div>
-              </div>
-
+            <div className="animate-fade-up delay-300 mt-10 flex flex-col items-center gap-4 sm:flex-row">
               <Link
                 href="/wohnungen"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#66735f] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                className="rounded-full bg-[#d8c7af] px-8 py-3.5 text-sm font-semibold text-[#1f1c19] shadow-lg transition hover:bg-white hover:scale-105"
               >
-                Zu den Wohnungen
+                Wohnungen entdecken
+              </Link>
+              <Link
+                href="/anfrage"
+                className="rounded-full border border-white/50 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+              >
+                Direkt anfragen
               </Link>
             </div>
           </div>
-        </section>
 
-        <section className="px-4 pb-10 sm:px-6 sm:pb-14">
-          <div className="mx-auto max-w-6xl rounded-[2rem] bg-[#f7f3ec] p-6 shadow-2xl sm:p-8 lg:p-10">
-            <div className="max-w-2xl">
-              <p className="text-xs uppercase tracking-[0.3em] text-stone-500">
-                Unsere Wohnungen
+          {/* Scroll-Indikator */}
+          <div className="animate-fade-in delay-500 absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50">
+            <span className="text-xs uppercase tracking-[0.3em]">Entdecken</span>
+            <div className="h-8 w-px bg-gradient-to-b from-white/50 to-transparent" />
+          </div>
+        </div>
+      </main>
+
+      {/* ── STATS-LEISTE ──────────────────────────────────────── */}
+      <section className="bg-[#1f1c19] text-white">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-white/10 lg:grid-cols-4">
+          {[
+            { value: "2", label: "Ferienwohnungen" },
+            { value: "60 m²", label: "pro Wohnung" },
+            { value: "5 km", label: "bis zum Strand" },
+            { value: "5+", label: "Gäste je Wohnung" },
+          ].map(({ value, label }) => (
+            <div key={label} className="px-6 py-8 text-center sm:px-10">
+              <p className="font-serif text-3xl font-semibold text-[#d8c7af] sm:text-4xl">
+                {value}
               </p>
-              <h2 className="mt-3 text-3xl font-semibold text-[#1f1c19] sm:text-4xl">
-                Zwei Rückzugsorte an der Nordsee
-              </h2>
-              <p className="mt-4 leading-7 text-stone-600">
-                Ruhige Lage am Feldrand, kinderfreundliche Ausstattung, zwei
-                Schlafzimmer und viel Platz zum Entspannen.
-              </p>
+              <p className="mt-1 text-sm text-white/55">{label}</p>
             </div>
+          ))}
+        </div>
+      </section>
 
-            {error && (
-              <p className="mt-6 text-red-600">
-                Fehler beim Laden der Wohnungen: {error.message}
-              </p>
-            )}
+      {/* ── WOHNUNGEN ──────────────────────────────────────────── */}
+      <section className="bg-[#f7f3ec] px-4 py-20 sm:px-6 sm:py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">
+              Unsere Ferienwohnungen
+            </p>
+            <h2 className="mt-3 font-serif text-4xl italic text-[#1f1c19] sm:text-5xl">
+              Zwei Rückzugsorte
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl leading-7 text-stone-500">
+              Jede Wohnung bietet alles, was du für einen entspannten Familienurlaub
+              an der Nordsee brauchst.
+            </p>
+          </div>
 
-            <div className="mt-10 grid gap-6 lg:grid-cols-2">
-              {typedApartments.map((apartment) => {
-                const imageUrl =
-                  apartment.coverImage?.[0]?.image_url || "/images/hero1.avif";
-
-                return (
-                  <div
-                    key={apartment.id}
-                    className="overflow-hidden rounded-[2rem] bg-white shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-                  >
-                    <div
-                      className="h-64 w-full bg-cover bg-center sm:h-72"
-                      style={{ backgroundImage: `url('${imageUrl}')` }}
-                    />
-
-                    <div className="p-6 sm:p-7">
-                      <h3 className="text-2xl font-semibold text-[#1f1c19]">
-                        {apartment.name}
-                      </h3>
-
-                      <p className="mt-4 leading-7 text-stone-600">
-                        {apartment.short_description}
-                      </p>
-
-                      <div className="mt-5 space-y-1 text-sm text-stone-700">
-                        <p>{apartment.guests}</p>
-                        <p>{apartment.size} m²</p>
+          <div className="mt-14 grid gap-8 lg:grid-cols-2">
+            {typedApartments.length > 0
+              ? typedApartments.map((apt) => {
+                  const img = apt.coverImage?.[0]?.image_url || "/images/hero1.avif";
+                  return (
+                    <Link
+                      key={apt.id}
+                      href={`/wohnungen/${apt.slug}`}
+                      className="group overflow-hidden rounded-[2.5rem] bg-white shadow-xl transition duration-500 hover:-translate-y-2 hover:shadow-2xl"
+                    >
+                      <div className="relative h-72 overflow-hidden sm:h-80">
+                        <div
+                          className="absolute inset-0 bg-cover bg-center transition duration-700 group-hover:scale-110"
+                          style={{ backgroundImage: `url('${img}')` }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                        <div className="absolute bottom-4 left-5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                          {apt.guests}
+                        </div>
                       </div>
-
-                      <Link
-                        href={`/wohnungen/${apartment.slug}`}
-                        className="mt-6 inline-flex items-center justify-center rounded-full bg-[#66735f] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-                      >
-                        Mehr erfahren
-                      </Link>
+                      <div className="p-7">
+                        <h3 className="font-serif text-2xl text-[#1f1c19]">{apt.name}</h3>
+                        <p className="mt-3 leading-7 text-stone-500">{apt.short_description}</p>
+                        <div className="mt-5 flex items-center justify-between">
+                          <span className="text-sm text-stone-400">{apt.size} m²</span>
+                          <span className="rounded-full bg-[#f7f3ec] px-4 py-2 text-sm font-semibold text-[#66735f] transition group-hover:bg-[#66735f] group-hover:text-white">
+                            Mehr erfahren →
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })
+              : /* Fallback wenn Supabase leer */
+                [
+                  { name: "Ferienwohnung Seerobbe", slug: "seerobbe", img: "/images/fewo1.1.avif", desc: "Ruhige, kinderfreundliche Ferienwohnung mit Terrasse und Spielwiese." },
+                  { name: "Ferienwohnung Leuchtturm", slug: "leuchtturm", img: "/images/fewo2.1.avif", desc: "Gemütliche Wohnung mit kleinem Garten und voll ausgestatteter Küche." },
+                ].map((apt) => (
+                  <Link
+                    key={apt.slug}
+                    href={`/wohnungen/${apt.slug}`}
+                    className="group overflow-hidden rounded-[2.5rem] bg-white shadow-xl transition duration-500 hover:-translate-y-2 hover:shadow-2xl"
+                  >
+                    <div className="relative h-72 overflow-hidden sm:h-80">
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition duration-700 group-hover:scale-110"
+                        style={{ backgroundImage: `url('${apt.img}')` }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                    <div className="p-7">
+                      <h3 className="font-serif text-2xl text-[#1f1c19]">{apt.name}</h3>
+                      <p className="mt-3 leading-7 text-stone-500">{apt.desc}</p>
+                      <div className="mt-5 flex items-center justify-between">
+                        <span className="text-sm text-stone-400">60 m²</span>
+                        <span className="rounded-full bg-[#f7f3ec] px-4 py-2 text-sm font-semibold text-[#66735f] transition group-hover:bg-[#66735f] group-hover:text-white">
+                          Mehr erfahren →
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-4 pb-10 sm:px-6 sm:pb-14">
-          <div className="mx-auto max-w-6xl">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { icon: "🌊", label: "Strand", value: "Ca. 5 km" },
-                { icon: "🏠", label: "Wohnungen", value: "2 Ferienwohnungen" },
-                { icon: "👨‍👩‍👧‍👦", label: "Ideal für", value: "Familien" },
-                { icon: "🐾", label: "Haustiere", value: "Nicht erlaubt" },
-              ].map(({ icon, label, value }) => (
-                <div
-                  key={label}
-                  className="rounded-[2rem] border border-white/20 bg-black/25 p-5 backdrop-blur-md"
-                >
-                  <span className="text-2xl">{icon}</span>
-                  <p className="mt-3 text-xs uppercase tracking-[0.2em] text-white/60">
-                    {label}
-                  </p>
-                  <p className="mt-1 font-semibold">{value}</p>
-                </div>
-              ))}
-            </div>
+      {/* ── VORTEILE ───────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-[#1f1c19] px-4 py-20 sm:px-6 sm:py-28">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: "url('/images/landschaft.avif')" }}
+        />
+        <div className="relative mx-auto max-w-6xl">
+          <div className="text-center text-white">
+            <p className="text-xs uppercase tracking-[0.35em] text-[#d8c7af]">
+              Warum bei uns?
+            </p>
+            <h2 className="mt-3 font-serif text-4xl italic sm:text-5xl">
+              Urlaub, wie er sein soll
+            </h2>
           </div>
-        </section>
 
-        <section className="px-4 pb-14 sm:px-6 sm:pb-20">
-          <div className="mx-auto max-w-6xl rounded-[2rem] border border-white/20 bg-black/25 p-6 text-white backdrop-blur-md sm:p-8 lg:p-10">
-            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/70">
-                  Dein nächster Urlaub
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
-                  Ankommen. Durchatmen. Nordsee.
-                </h2>
-                <p className="mt-4 max-w-2xl leading-7 text-white/85">
-                  Ruhige Feldrandlage, familienfreundliche Ausstattung und das
-                  Meer zum Greifen nah – schreib uns einfach an.
-                </p>
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: "🌿",
+                title: "Ruhige Feldrandlage",
+                desc: "Kein Trubel, kein Lärm – nur Weite, frische Luft und das Rauschen des Windes.",
+              },
+              {
+                icon: "👨‍👩‍👧‍👦",
+                title: "Familien willkommen",
+                desc: "Babybett, Kinderhochstuhl, Spielwiese, Trampolin, Sandkasten – alles da.",
+              },
+              {
+                icon: "🏖️",
+                title: "Strand in 5 Minuten",
+                desc: "Harlesiel und Carolinensiel sind mit dem Auto in ca. 5 km erreichbar.",
+              },
+              {
+                icon: "🍳",
+                title: "Voll ausgestattet",
+                desc: "Küche, Spülmaschine, Waschmaschine, Trockner, WLAN, TV – alles inklusive.",
+              },
+              {
+                icon: "✨",
+                title: "Liebevoll eingerichtet",
+                desc: "Warmes Design, hochwertige Materialien und eine persönliche Note.",
+              },
+              {
+                icon: "📩",
+                title: "Direkte Buchung",
+                desc: "Kein Zwischenhändler, keine Gebühren – du buchst direkt bei uns.",
+              },
+            ].map(({ icon, title, desc }) => (
+              <div
+                key={title}
+                className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition hover:bg-white/10 sm:p-7"
+              >
+                <span className="text-3xl">{icon}</span>
+                <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/60">{desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* ── UMGEBUNG ───────────────────────────────────────────── */}
+      <section className="bg-[#f7f3ec] px-4 py-20 sm:px-6 sm:py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">
+                Die Umgebung
+              </p>
+              <h2 className="mt-3 font-serif text-4xl italic text-[#1f1c19] sm:text-5xl">
+                Nordsee pur
+              </h2>
+              <p className="mt-5 leading-7 text-stone-500">
+                Altfunnixsiel liegt im Herzen Ostfrieslands – umgeben von weiten
+                Feldern, frischer Seeluft und der unverwechselbaren Stille der
+                Küstenlandschaft.
+              </p>
+              <ul className="mt-7 space-y-3">
+                {[
+                  "Harlesiel & Carolinensiel: ca. 5 km",
+                  "Nationalpark Wattenmeer direkt nebenan",
+                  "Fahrradtouren durch die Marschenlandschaft",
+                  "Krabben essen, Deichspaziergänge, Sonnenuntergänge",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-stone-600">
+                    <span className="mt-0.5 text-[#66735f]">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
               <Link
                 href="/anfrage"
-                className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#d8c7af] px-6 py-3 text-sm font-semibold text-[#1f1c19] transition hover:opacity-90"
+                className="mt-8 inline-flex items-center rounded-full bg-[#66735f] px-7 py-3.5 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                Jetzt anfragen
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div
+                className="col-span-2 h-64 rounded-[2rem] bg-cover bg-center shadow-xl sm:h-72"
+                style={{ backgroundImage: "url('/images/landschaft.avif')" }}
+              />
+              <div
+                className="h-40 rounded-[2rem] bg-cover bg-center shadow-lg sm:h-48"
+                style={{ backgroundImage: "url('/images/fewo1.1.avif')" }}
+              />
+              <div
+                className="h-40 rounded-[2rem] bg-cover bg-center shadow-lg sm:h-48"
+                style={{ backgroundImage: "url('/images/fewo2.1.avif')" }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/hero1.avif')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
+        <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+          <div className="max-w-2xl text-white">
+            <p className="text-xs uppercase tracking-[0.35em] text-[#d8c7af]">
+              Bereit für Urlaub?
+            </p>
+            <h2 className="mt-3 font-serif text-4xl italic sm:text-5xl lg:text-6xl">
+              Dein nächster Sommer<br />
+              <span className="not-italic font-semibold">wartet auf dich.</span>
+            </h2>
+            <p className="mt-5 max-w-lg leading-7 text-white/80">
+              Schreib uns einfach – wir antworten schnell und persönlich.
+            </p>
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/anfrage"
+                className="inline-flex items-center justify-center rounded-full bg-[#d8c7af] px-8 py-4 text-sm font-semibold text-[#1f1c19] shadow-xl transition hover:bg-white hover:scale-105"
               >
                 Jetzt Urlaub anfragen
               </Link>
+              <Link
+                href="/wohnungen"
+                className="inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+              >
+                Wohnungen ansehen
+              </Link>
             </div>
           </div>
-        </section>
-      </div>
-    </main>
+        </div>
+      </section>
 
-    <Footer />
-  </>
+      <Footer />
+    </>
   );
 }

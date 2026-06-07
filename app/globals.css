@@ -4,6 +4,11 @@
   --background: #f7f3ec;
   --foreground: #1f1c19;
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --sand: #d8c7af;
+  --sage: #66735f;
+  --cream: #f7f3ec;
+  --warm: #efe6d9;
 }
 
 html {
@@ -15,3 +20,37 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.7s ease both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease both;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }

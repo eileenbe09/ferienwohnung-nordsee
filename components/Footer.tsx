@@ -3,48 +3,69 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="bg-[#1f1c19] text-stone-300">
-      <div className="mx-auto max-w-6xl px-6 py-12">
+      <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 sm:grid-cols-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">
-              Nordsee Ferienwohnungen
+          <div className="sm:col-span-1">
+            <p className="font-serif text-2xl italic text-white">
+              Nordsee<br />
+              <span className="not-italic font-semibold text-[#d8c7af]">Ferienwohnungen</span>
             </p>
-            <p className="mt-3 text-sm leading-6 text-stone-400">
+            <p className="mt-4 text-sm leading-6 text-stone-400">
               Zwei liebevoll eingerichtete Ferienwohnungen in Altfunnixsiel –
-              ruhig gelegen, ca. 5 km vom Strand.
+              direkt am Feldrand, nah am Meer.
             </p>
           </div>
 
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">
-              Navigation
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+              Seiten
             </p>
-            <ul className="mt-3 space-y-2 text-sm text-stone-400">
-              <li><Link href="/" className="hover:text-white transition">Start</Link></li>
-              <li><Link href="/wohnungen" className="hover:text-white transition">Wohnungen</Link></li>
-              <li><Link href="/anfrage" className="hover:text-white transition">Anfrage</Link></li>
-              <li><Link href="/kontakt" className="hover:text-white transition">Kontakt</Link></li>
+            <ul className="mt-4 space-y-2.5 text-sm text-stone-400">
+              {[
+                { href: "/", label: "Start" },
+                { href: "/wohnungen", label: "Wohnungen" },
+                { href: "/anfrage", label: "Anfrage" },
+                { href: "/kontakt", label: "Kontakt" },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className="hover:text-white transition">
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
               Kontakt
             </p>
-            <ul className="mt-3 space-y-2 text-sm text-stone-400">
-              <li>Altfunnixsiel, Niedersachsen</li>
+            <ul className="mt-4 space-y-2.5 text-sm text-stone-400">
+              <li>Altfunnixsiel, 26427 Niedersachsen</li>
               <li>
-                <a href="mailto:info@ferienwohnungen-lojdl.de" className="hover:text-white transition">
+                <a
+                  href="mailto:info@ferienwohnungen-lojdl.de"
+                  className="hover:text-white transition"
+                >
                   info@ferienwohnungen-lojdl.de
                 </a>
               </li>
             </ul>
+
+            <Link
+              href="/anfrage"
+              className="mt-6 inline-flex items-center rounded-full bg-[#66735f] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Jetzt anfragen
+            </Link>
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6 text-xs text-stone-500">
-          © 2026 Nordsee Ferienwohnungen Lojdl ·{" "}
-          <Link href="/kontakt" className="hover:text-stone-300 transition">
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
+          <p className="text-xs text-stone-500">
+            © 2026 Nordsee Ferienwohnungen Lojdl
+          </p>
+          <Link href="/kontakt" className="text-xs text-stone-500 hover:text-stone-300 transition">
             Impressum
           </Link>
         </div>
