@@ -1,45 +1,51 @@
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import AvailabilityCalendar from "@/components/AvailabilityCalendar";
+import { apartments } from "@/data/apartments";
 
 export default function BelegungPage() {
   return (
     <>
-      <main className="relative min-h-screen overflow-hidden text-white">
-        <div
-          className="fixed inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/hero1.avif')" }}
-        />
-        <div className="fixed inset-0 bg-black/35" />
-
-        <div className="relative z-10 pb-20">
-          <Navbar transparent />
-
-          <section className="mx-auto mt-10 max-w-6xl px-4 sm:mt-14 sm:px-6 lg:mt-20">
-            <div className="max-w-2xl">
-              <p className="text-xs uppercase tracking-[0.35em] text-white/75 sm:text-sm">
-                Verfügbarkeit
-              </p>
-              <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
-                Belegungsplan
-              </h1>
-              <p className="mt-5 text-base leading-7 text-white/85">
-                Der Belegungskalender ist in Kürze verfügbar. Für aktuelle
-                Verfügbarkeiten schreib uns direkt an.
-              </p>
-              <div className="mt-8">
-                <Link
-                  href="/anfrage"
-                  className="inline-flex items-center justify-center rounded-full bg-[#d8c7af] px-6 py-3 text-sm font-semibold text-[#1f1c19] transition hover:opacity-90"
-                >
-                  Verfügbarkeit anfragen
-                </Link>
-              </div>
-            </div>
-          </section>
+      {/* HEADER */}
+      <div className="bg-[#1f1c19]">
+        <Navbar dark />
+        <div className="mx-auto max-w-6xl px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
+          <p className="text-xs uppercase tracking-[0.4em] text-[#d8c7af]">Verfügbarkeit</p>
+          <h1 className="mt-3 font-serif text-4xl italic text-white sm:text-5xl">
+            Belegungskalender
+          </h1>
+          <p className="mt-3 max-w-lg text-stone-400">
+            Hier siehst du die Preissaisons für unsere Wohnungen. Für konkrete Verfügbarkeiten schreib uns direkt an.
+          </p>
         </div>
-      </main>
+      </div>
 
+      {/* KALENDER */}
+      <section className="bg-[#f7f3ec] px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-6xl space-y-8">
+          {apartments.map((apt) => (
+            <div key={apt.slug}>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#66735f]">
+                {apt.name}
+              </p>
+              <AvailabilityCalendar prices={apt.prices} slug={apt.slug} />
+            </div>
+          ))}
+
+          <div className="rounded-3xl bg-[#1f1c19] p-8 text-center text-white sm:p-10">
+            <h2 className="font-serif text-2xl italic sm:text-3xl">
+              Wunschtermin anfragen
+            </h2>
+            <p className="mt-2 text-stone-400">Wir prüfen die Verfügbarkeit und melden uns schnell zurück.</p>
+            <Link
+              href="/anfrage"
+              className="mt-6 inline-flex items-center rounded-full bg-[#d8c7af] px-8 py-3.5 text-sm font-semibold text-[#1f1c19] transition hover:bg-white"
+            >
+              Jetzt anfragen →
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
-

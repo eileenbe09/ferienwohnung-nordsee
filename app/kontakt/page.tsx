@@ -4,113 +4,105 @@ import Link from "next/link";
 export default function KontaktPage() {
   return (
     <>
-      <main className="relative min-h-screen overflow-hidden text-white">
-        <div
-          className="fixed inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/landschaft.avif')" }}
-        />
-        <div className="fixed inset-0 bg-black/40" />
+      {/* HEADER */}
+      <div className="bg-[#1f1c19]">
+        <Navbar dark />
+        <div className="mx-auto max-w-6xl px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
+          <p className="text-xs uppercase tracking-[0.4em] text-[#d8c7af]">Kontakt & Impressum</p>
+          <h1 className="mt-3 font-serif text-4xl italic text-white sm:text-5xl">
+            So erreichst du uns
+          </h1>
+          <p className="mt-3 max-w-lg text-stone-400">
+            Bei Fragen zu unseren Ferienwohnungen, Verfügbarkeiten oder Preisen stehen wir dir gerne zur Verfügung.
+          </p>
+        </div>
+      </div>
 
-        <div className="relative z-10 pb-20">
-          <Navbar transparent />
-
-          <section className="mx-auto mt-10 max-w-6xl px-4 sm:mt-14 sm:px-6 lg:mt-20">
-            <div className="max-w-3xl">
-              <p className="text-xs uppercase tracking-[0.35em] text-white/75 sm:text-sm">
-                Kontakt & Impressum
-              </p>
-              <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-                So erreichst du uns
-              </h1>
-              <p className="mt-5 text-base leading-7 text-white/85 sm:text-lg">
-                Bei Fragen zu unseren Ferienwohnungen, Verfügbarkeiten oder
-                Preisen stehen wir dir gerne zur Verfügung.
-              </p>
-            </div>
-
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-[2rem] border border-white/20 bg-black/25 p-6 backdrop-blur-md sm:p-8">
-                <div className="text-3xl">📍</div>
-                <h2 className="mt-4 text-lg font-semibold">Adresse</h2>
-                <p className="mt-2 text-sm leading-6 text-white/80">
-                  Altfunnixsiel<br />
-                  26427 Neuharlingersiel<br />
-                  Niedersachsen
-                </p>
+      {/* KONTAKTKARTEN */}
+      <section className="bg-[#f7f3ec] px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-5 sm:grid-cols-3">
+            {[
+              {
+                icon: "📍",
+                title: "Adresse",
+                lines: ["Altfunnixsiel", "26427 Neuharlingersiel", "Niedersachsen"],
+              },
+              {
+                icon: "✉️",
+                title: "E-Mail",
+                lines: ["info@ferienwohnungen-lojdl.de"],
+                href: "mailto:info@ferienwohnungen-lojdl.de",
+                sub: "Antwort innerhalb von 24 Stunden",
+              },
+              {
+                icon: "🏖️",
+                title: "Lage",
+                lines: ["Ca. 5 km bis Harlesiel", "Ca. 5 km bis Carolinensiel", "Ruhige Feldrandlage"],
+              },
+            ].map(({ icon, title, lines, href, sub }) => (
+              <div key={title} className="rounded-3xl bg-white p-7 shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f7f3ec] text-2xl">
+                  {icon}
+                </div>
+                <h2 className="mt-4 font-serif text-xl text-[#1f1c19]">{title}</h2>
+                <div className="mt-3 space-y-0.5">
+                  {lines.map((l) =>
+                    href ? (
+                      <a key={l} href={href} className="block text-sm leading-6 text-stone-500 hover:text-[#66735f] transition">
+                        {l}
+                      </a>
+                    ) : (
+                      <p key={l} className="text-sm leading-6 text-stone-500">{l}</p>
+                    )
+                  )}
+                  {sub && <p className="mt-2 text-xs text-stone-400">{sub}</p>}
+                </div>
               </div>
+            ))}
+          </div>
 
-              <div className="rounded-[2rem] border border-white/20 bg-black/25 p-6 backdrop-blur-md sm:p-8">
-                <div className="text-3xl">✉️</div>
-                <h2 className="mt-4 text-lg font-semibold">E-Mail</h2>
-                <a
-                  href="mailto:info@ferienwohnungen-lojdl.de"
-                  className="mt-2 block text-sm leading-6 text-white/80 hover:text-white transition"
-                >
+          {/* KARTE */}
+          <div className="mt-8 overflow-hidden rounded-3xl shadow-lg">
+            <iframe
+              src="https://www.google.com/maps?q=Altfunnixsiel,+Niedersachsen&output=embed"
+              width="100%"
+              height="360"
+              style={{ border: 0, display: "block" }}
+              loading="lazy"
+              title="Karte von Altfunnixsiel"
+            />
+          </div>
+
+          {/* IMPRESSUM */}
+          <div className="mt-8 rounded-3xl bg-white p-7 shadow-sm sm:p-10">
+            <h2 className="font-serif text-2xl text-[#1f1c19]">Impressum</h2>
+            <div className="mt-4 space-y-1 text-sm leading-7 text-stone-500">
+              <p className="font-semibold text-[#1f1c19]">Ferienwohnungen Lojdl</p>
+              <p>Altfunnixsiel, 26427 Neuharlingersiel, Niedersachsen</p>
+              <p>
+                E-Mail:{" "}
+                <a href="mailto:info@ferienwohnungen-lojdl.de" className="hover:text-[#66735f] transition">
                   info@ferienwohnungen-lojdl.de
                 </a>
-                <p className="mt-3 text-xs text-white/55">
-                  Antwort in der Regel innerhalb von 24 Stunden
-                </p>
-              </div>
-
-              <div className="rounded-[2rem] border border-white/20 bg-black/25 p-6 backdrop-blur-md sm:p-8">
-                <div className="text-3xl">🏖️</div>
-                <h2 className="mt-4 text-lg font-semibold">Lage</h2>
-                <p className="mt-2 text-sm leading-6 text-white/80">
-                  Ca. 5 km bis Harlesiel<br />
-                  Ca. 5 km bis Carolinensiel<br />
-                  Ruhige Feldrandlage
-                </p>
-              </div>
+              </p>
+              <p className="pt-3 text-xs text-stone-400">
+                Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Ferienwohnungen Lojdl, Altfunnixsiel, 26427 Niedersachsen
+              </p>
             </div>
+          </div>
 
-            <div className="mt-6 overflow-hidden rounded-[2rem] shadow-2xl">
-              <iframe
-                src="https://www.google.com/maps?q=Altfunnixsiel,+Niedersachsen&output=embed"
-                width="100%"
-                height="380"
-                style={{ border: 0, display: "block" }}
-                loading="lazy"
-                title="Karte von Altfunnixsiel"
-              />
-            </div>
-
-            <div className="mt-10 rounded-[2rem] border border-white/20 bg-black/25 p-6 backdrop-blur-md sm:p-8 lg:p-10">
-              <h2 className="text-2xl font-semibold">Impressum</h2>
-              <div className="mt-4 space-y-2 text-sm leading-7 text-white/80">
-                <p className="font-medium text-white">
-                  Ferienwohnungen Lojdl
-                </p>
-                <p>Altfunnixsiel, 26427 Niedersachsen</p>
-                <p>
-                  E-Mail:{" "}
-                  <a
-                    href="mailto:info@ferienwohnungen-lojdl.de"
-                    className="hover:text-white transition"
-                  >
-                    info@ferienwohnungen-lojdl.de
-                  </a>
-                </p>
-                <p className="pt-2 text-white/55 text-xs">
-                  Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV:
-                  Ferienwohnungen Lojdl, Altfunnixsiel, 26427 Niedersachsen
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-8 text-center">
-              <Link
-                href="/anfrage"
-                className="inline-flex items-center justify-center rounded-full bg-[#d8c7af] px-8 py-3.5 text-sm font-semibold text-[#1f1c19] transition hover:opacity-90"
-              >
-                Jetzt anfragen
-              </Link>
-            </div>
-          </section>
+          {/* CTA */}
+          <div className="mt-10 flex justify-center">
+            <Link
+              href="/anfrage"
+              className="inline-flex items-center rounded-full bg-[#1f1c19] px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-[#66735f]"
+            >
+              Jetzt anfragen →
+            </Link>
+          </div>
         </div>
-      </main>
-
+      </section>
     </>
   );
 }
-
