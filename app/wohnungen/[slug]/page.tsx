@@ -4,7 +4,6 @@ import { supabase } from "@/lib/supabase";
 import ApartmentGallery from "@/components/ApartmentGallery";
 import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { apartments as staticApartments } from "@/data/apartments";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -270,8 +269,6 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
-
-      <Footer />
     </>
   );
 }

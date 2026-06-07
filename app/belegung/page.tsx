@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Link from "next/link";
 
 export default function BelegungPage() {
@@ -40,7 +39,7 @@ export default function BelegungPage() {
         </div>
       </main>
 
-      <Footer />
     </>
   );
 }
+

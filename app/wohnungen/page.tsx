@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 type ApartmentRow = {
   id: number;
@@ -191,7 +190,7 @@ export default async function WohnungenPage() {
         </div>
       </section>
 
-      <Footer />
     </>
   );
 }
+
