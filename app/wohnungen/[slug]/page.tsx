@@ -175,22 +175,22 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
+              {/* Kalender mit Belegung */}
+              {staticApt && (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Verfügbarkeit</p>
+                  <div className="mt-4">
+                    <AvailabilityCalendar prices={staticApt.prices} slug={slug} />
+                  </div>
+                </div>
+              )}
+
               {/* Preiskalkulator */}
               {staticApt && (
                 <div>
                   <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Preis berechnen</p>
                   <div className="mt-4">
                     <PriceCalculator slug={slug} prices={staticApt.prices} finalCleaning={staticApt.finalCleaning} />
-                  </div>
-                </div>
-              )}
-
-              {/* Kalender mit Belegung */}
-              {staticApt && (
-                <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Belegung & Preissaisons</p>
-                  <div className="mt-4">
-                    <AvailabilityCalendar prices={staticApt.prices} slug={slug} />
                   </div>
                 </div>
               )}

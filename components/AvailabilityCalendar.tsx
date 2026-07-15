@@ -145,16 +145,16 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
               key={day}
               className={`relative flex flex-col items-center justify-center rounded-lg py-1.5 transition
                 ${booked
-                  ? "bg-red-100 text-red-400 line-through"
+                  ? "bg-red-500 text-white shadow-sm"
                   : periodIdx >= 0
                   ? SEASON_COLORS[periodIdx]
                   : isPast ? "text-stone-200" : "text-stone-300"}
                 ${isToday ? "ring-2 ring-[#66735f] ring-offset-1" : ""}
               `}
             >
-              <span className={`text-sm font-semibold leading-none ${isPast && !booked ? "opacity-40" : ""}`}>{day}</span>
+              <span className={`text-sm font-bold leading-none ${isPast && !booked ? "opacity-40" : ""} ${booked ? "line-through opacity-80" : ""}`}>{day}</span>
               {booked ? (
-                <span className="mt-0.5 text-[9px] leading-none text-red-400">Belegt</span>
+                <span className="mt-0.5 text-[9px] font-semibold leading-none text-red-100">Belegt</span>
               ) : dayPrice ? (
                 <span className="mt-0.5 text-[9px] leading-none opacity-70">{dayPrice}</span>
               ) : null}
@@ -166,8 +166,8 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
       {/* Legende */}
       <div className="mt-5 flex flex-wrap gap-3 border-t border-stone-100 pt-4">
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-sm bg-red-100 border border-red-200" />
-          <span className="text-xs text-stone-500">Belegt</span>
+          <div className="h-3 w-3 rounded-sm bg-red-500" />
+          <span className="text-xs font-semibold text-red-600">Belegt</span>
         </div>
         {uniquePrices.map((price, i) => (
           <div key={price} className="flex items-center gap-1.5">
