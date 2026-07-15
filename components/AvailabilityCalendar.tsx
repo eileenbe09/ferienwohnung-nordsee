@@ -124,18 +124,29 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
           const day = i + 1;
           const date = new Date(year, month, day);
           const periodIdx = getPeriodIndex(date);
-          const isToday =
-            date.toDateString() === today.toDateString();
+          const isToday = date.toDateString() === today.toDateString();
+
+          let dayPrice: string | null = null;
+          for (let p = 0; p < periods.length; p++) {
+            if (date >= periods[p].from && date < periods[p].to) {
+              const match = periods[p].price.match(/(\d+)/);
+              dayPrice = match ? `${match[1]} €` : null;
+              break;
+            }
+          }
 
           return (
             <div
               key={day}
-              className={`relative flex h-9 items-center justify-center rounded-lg text-sm transition
+              className={`relative flex flex-col items-center justify-center rounded-lg py-1.5 transition
                 ${periodIdx >= 0 ? SEASON_COLORS[periodIdx] : "text-stone-300"}
                 ${isToday ? "ring-2 ring-[#66735f] ring-offset-1" : ""}
               `}
             >
-              {day}
+              <span className="text-sm font-semibold leading-none">{day}</span>
+              {dayPrice && (
+                <span className="mt-0.5 text-[9px] leading-none opacity-70">{dayPrice}</span>
+              )}
             </div>
           );
         })}
