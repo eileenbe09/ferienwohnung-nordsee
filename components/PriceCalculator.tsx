@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase-browser";
 
 type PricePeriod = {
   from: string; // "DD.MM.YYYY"
@@ -85,12 +86,28 @@ function Counter({
 
 const CHILD_AGE_OPTIONS = Array.from({ length: 18 }, (_, i) => i); // 0–17
 
+type Booking = { check_in: string; check_out: string };
+
 export default function PriceCalculator({ slug, prices, finalCleaning }: Props) {
   const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("bookings")
+      .select("check_in, check_out")
+      .eq("apartment_slug", slug)
+      .then(({ data }) => { if (data) setBookings(data); });
+  }, [slug]);
+
+  function rangeOverlapsBooking(from: string, to: string): Booking | null {
+    return bookings.find((b) => b.check_in < to && b.check_out > from) ?? null;
+  }
   const [adults, setAdults] = useState(2);
   const [childAges, setChildAges] = useState<number[]>([]); // one entry per child
   const [wantsBettwaesche, setWantsBettwaesche] = useState(false);
@@ -110,8 +127,11 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
     setChildAges((prev) => prev.map((a, i) => (i === idx ? age : a)));
   }
 
+  const conflict = checkIn && checkOut ? rangeOverlapsBooking(checkIn, checkOut) : null;
+
   const calc = useMemo(() => {
     if (!checkIn || !checkOut) return null;
+    if (rangeOverlapsBooking(checkIn, checkOut)) return null;
     const from = new Date(checkIn);
     const to = new Date(checkOut);
     const nights = daysBetween(from, to);
@@ -142,7 +162,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
     const total = baseTotal + extraTotal + cleaning + bettwaescheTotal + handtuchTotal;
 
     return { nights, breakdown, baseTotal, extraTotal, bettwaescheTotal, handtuchTotal, total };
-  }, [checkIn, checkOut, totalPersons, wantsBettwaesche, wantsHandtuch, prices, cleaning, extraPerNight]);
+  }, [checkIn, checkOut, totalPersons, wantsBettwaesche, wantsHandtuch, prices, cleaning, extraPerNight, bookings]);
 
   function handleAnfrage() {
     const childrenStr = childAges.length > 0
@@ -331,7 +351,18 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
         </div>
       ) : (
         checkIn && checkOut && (
-          <p className="mt-4 text-sm text-red-500">Bitte ein gültiges Datum wählen (Abreise nach Anreise).</p>
+          <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+            {conflict ? (
+              <>
+                <p className="text-sm font-semibold text-red-600">Dieser Zeitraum ist bereits belegt</p>
+                <p className="mt-0.5 text-xs text-red-400">
+                  Bitte wähle einen anderen Zeitraum. Im Verfügbarkeitskalender oben siehst du alle freien Daten.
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-red-500">Bitte ein gültiges Datum wählen (Abreise nach Anreise).</p>
+            )}
+          </div>
         )
       )}
 
