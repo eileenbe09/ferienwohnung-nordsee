@@ -54,17 +54,16 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
       ? dbFeatures.map((f) => ({ id: f.id, label: f.label }))
       : (staticApt?.features ?? []).map((label, i) => ({ id: i, label }));
 
-  const prices =
+  // Preise: Supabase-Daten (from_date/to_date/price_per_night) haben Vorrang
+  type PricePeriod = { from: string; to: string; price: string };
+  const calendarPrices: PricePeriod[] =
     dbPrices && dbPrices.length > 0
-      ? dbPrices
-      : (staticApt?.prices ?? []).map((p, i) => ({
-          id: i,
-          start_date: null,
-          end_date: null,
-          price_per_night: null,
-          label: `${p.from} – ${p.to}`,
-          price: p.price,
-        }));
+      ? dbPrices.map((p: { from_date: string; to_date: string; price_per_night: number }) => ({
+          from: p.from_date,
+          to: p.to_date,
+          price: `${p.price_per_night},00 € / Nacht`,
+        }))
+      : staticApt?.prices ?? [];
 
   const name = apartment?.name ?? staticApt?.name ?? "";
   const description = apartment?.description ?? staticApt?.description ?? "";
@@ -75,10 +74,6 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   const location = apartment?.location ?? staticApt?.location ?? "Altfunnixsiel, ca. 5 km bis Harlesiel";
   const spaTax = apartment?.spa_tax ?? staticApt?.spaTax ?? "Erwachsene 2,50 € / Nacht";
   const optionalAddons = apartment?.optional_addons ?? "Bettwäsche-Set, Handtücher auf Anfrage";
-
-  function formatDate(dateString: string) {
-    return new Intl.DateTimeFormat("de-DE").format(new Date(dateString));
-  }
 
   const highlights = [
     { icon: "🏠", label: `${size} m²` },
@@ -176,21 +171,21 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
               </div>
 
               {/* Kalender mit Belegung */}
-              {staticApt && (
+              {calendarPrices.length > 0 && (
                 <div>
                   <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Verfügbarkeit</p>
                   <div className="mt-4">
-                    <AvailabilityCalendar prices={staticApt.prices} slug={slug} />
+                    <AvailabilityCalendar prices={calendarPrices} slug={slug} />
                   </div>
                 </div>
               )}
 
               {/* Preiskalkulator */}
-              {staticApt && (
+              {calendarPrices.length > 0 && (
                 <div>
                   <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Preis berechnen</p>
                   <div className="mt-4">
-                    <PriceCalculator slug={slug} prices={staticApt.prices} finalCleaning={staticApt.finalCleaning} />
+                    <PriceCalculator slug={slug} prices={calendarPrices} finalCleaning={finalCleaning} />
                   </div>
                 </div>
               )}
