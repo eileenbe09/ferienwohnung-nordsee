@@ -52,12 +52,17 @@ export default function AdminDashboard({ bookings: initial }: { bookings: Bookin
             <p className="font-serif text-xl italic text-white">Admin-Bereich</p>
             <p className="text-xs text-stone-400">Nordsee Ferienwohnungen Lojdl</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="rounded-full border border-white/20 px-4 py-2 text-xs text-stone-300 transition hover:bg-white/10"
-          >
-            Abmelden
-          </button>
+          <div className="flex items-center gap-3">
+            <a href="/" className="rounded-full border border-white/20 px-4 py-2 text-xs text-stone-300 transition hover:bg-white/10">
+              ← Zur Webseite
+            </a>
+            <button
+              onClick={handleLogout}
+              className="rounded-full border border-white/20 px-4 py-2 text-xs text-stone-300 transition hover:bg-white/10"
+            >
+              Abmelden
+            </button>
+          </div>
         </div>
       </div>
 
