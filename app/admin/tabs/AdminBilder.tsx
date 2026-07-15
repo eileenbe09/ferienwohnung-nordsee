@@ -10,13 +10,18 @@ type AptImage = { id: string; image_url: string; sort_order: number };
 export default function AdminBilder({ slug }: { slug: string }) {
   const supabase = createClient();
   const staticApt = staticApartments.find((a) => a.slug === slug)!;
-  const fileRef = useRef<HTMLInputElement>(null);
+  const uploadRef = useRef<HTMLInputElement>(null);
+  const replaceRef = useRef<HTMLInputElement>(null);
+  const [replacingId, setReplacingId] = useState<string | null>(null);
 
   const [aptId, setAptId] = useState<number | null>(null);
   const [images, setImages] = useState<AptImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [seeding, setSeeding] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
+
+  const hasDBImages = images.some((i) => !i.id.startsWith("static"));
 
   useEffect(() => { load(); }, [slug]);
 
@@ -29,7 +34,6 @@ export default function AdminBilder({ slug }: { slug: string }) {
       if (data && data.length > 0) {
         setImages(data as AptImage[]);
       } else {
-        // Seed static images into view (read-only, user can then add via upload)
         setImages(staticApt.gallery.map((url, i) => ({ id: `static-${i}`, image_url: url, sort_order: i })));
       }
     } else {
@@ -38,89 +42,124 @@ export default function AdminBilder({ slug }: { slug: string }) {
     setLoading(false);
   }
 
-  async function handleUpload(file: File) {
+  async function handleSeed() {
     if (!aptId) return;
-    setUploading(true);
+    setSeeding(true);
+    const rows = staticApt.gallery.map((url, i) => ({ apartment_id: aptId, image_url: url, sort_order: i }));
+    const { data, error } = await supabase.from("apartment_images").insert(rows).select();
+    if (!error && data) {
+      setImages(data as AptImage[]);
+      flash("✓ Bilder übertragen – du kannst sie jetzt ersetzen oder löschen.");
+    } else flash("Fehler beim Übertragen.");
+    setSeeding(false);
+  }
+
+  async function uploadFile(file: File): Promise<string | null> {
     const ext = file.name.split(".").pop();
     const filename = `${slug}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("apartment-images").upload(filename, file, { contentType: file.type });
+    if (error) { flash("Upload-Fehler. Ist der Supabase-Speicher eingerichtet?"); return null; }
+    const { data } = supabase.storage.from("apartment-images").getPublicUrl(filename);
+    return data.publicUrl;
+  }
 
-    const { error: upErr } = await supabase.storage.from("apartment-images").upload(filename, file, { contentType: file.type });
-    if (upErr) {
-      flash("Fehler beim Upload. Ist der Supabase-Speicher eingerichtet?");
-      setUploading(false);
-      return;
+  async function handleUploadNew(file: File) {
+    if (!aptId) return;
+    setUploading(true);
+    const url = await uploadFile(file);
+    if (url) {
+      const nextOrder = images.filter((i) => !i.id.startsWith("static")).length;
+      const { data, error } = await supabase
+        .from("apartment_images")
+        .insert({ apartment_id: aptId, image_url: url, sort_order: nextOrder })
+        .select().single();
+      if (!error && data) {
+        setImages((prev) => [...prev.filter((i) => !i.id.startsWith("static")), data as AptImage]);
+        flash("✓ Bild hinzugefügt.");
+      }
     }
+    setUploading(false);
+  }
 
-    const { data: urlData } = supabase.storage.from("apartment-images").getPublicUrl(filename);
-    const publicUrl = urlData.publicUrl;
-    const nextOrder = images.filter((i) => !i.id.startsWith("static")).length;
-
-    const { data: row, error: dbErr } = await supabase
-      .from("apartment_images")
-      .insert({ apartment_id: aptId, image_url: publicUrl, sort_order: nextOrder })
-      .select().single();
-
-    if (!dbErr && row) {
-      setImages((prev) => {
-        // Replace static images with real ones on first upload
-        const real = prev.filter((i) => !i.id.startsWith("static"));
-        return [...real, row as AptImage];
-      });
-      flash("✓ Bild hochgeladen.");
-    } else flash("Fehler beim Speichern der Bild-URL.");
+  async function handleReplace(img: AptImage, file: File) {
+    setUploading(true);
+    const url = await uploadFile(file);
+    if (url) {
+      // Remove old storage file if it was a storage URL
+      if (img.image_url.includes("apartment-images/")) {
+        const path = img.image_url.split("/apartment-images/")[1];
+        if (path) await supabase.storage.from("apartment-images").remove([path]);
+      }
+      await supabase.from("apartment_images").update({ image_url: url }).eq("id", img.id);
+      setImages((prev) => prev.map((i) => (i.id === img.id ? { ...i, image_url: url } : i)));
+      flash("✓ Bild ersetzt.");
+    }
+    setReplacingId(null);
     setUploading(false);
   }
 
   async function handleDelete(img: AptImage) {
-    if (img.id.startsWith("static")) return;
     if (!confirm("Bild löschen?")) return;
-    await supabase.from("apartment_images").delete().eq("id", img.id);
-    // Try to remove from storage if it's a storage URL
-    if (img.image_url.includes("apartment-images")) {
+    if (img.image_url.includes("apartment-images/")) {
       const path = img.image_url.split("/apartment-images/")[1];
       if (path) await supabase.storage.from("apartment-images").remove([path]);
     }
+    await supabase.from("apartment_images").delete().eq("id", img.id);
     setImages((prev) => prev.filter((i) => i.id !== img.id));
   }
 
   function flash(text: string) { setMsg(text); setTimeout(() => setMsg(""), 4000); }
-
   const isStatic = !aptId;
 
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-serif text-2xl text-[#1f1c19]">Bilder</h2>
           <p className="mt-1 text-sm text-stone-400">
-            {isStatic
-              ? "Aktuelle Bilder (einprogrammiert). SQL-Setup nötig zum Bearbeiten."
-              : "Bilder hochladen, ersetzen oder löschen."}
+            {hasDBImages
+              ? "Hover über ein Bild → Ersetzen oder Löschen."
+              : "Klicke „Jetzt einrichten" um die aktuellen Bilder bearbeitbar zu machen."}
           </p>
         </div>
-        {!isStatic && (
-          <>
-            <button
-              onClick={() => fileRef.current?.click()}
-              disabled={uploading}
-              className="shrink-0 rounded-full bg-[#1f1c19] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#66735f] disabled:opacity-50"
-            >
-              {uploading ? "Hochladen…" : "+ Bild hochladen"}
+        <div className="flex gap-2">
+          {aptId && !hasDBImages && (
+            <button onClick={handleSeed} disabled={seeding}
+              className="rounded-full bg-[#66735f] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50">
+              {seeding ? "Übertragen…" : "Jetzt einrichten →"}
             </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); e.target.value = ""; }}
-            />
-          </>
-        )}
+          )}
+          {hasDBImages && (
+            <>
+              <button onClick={() => uploadRef.current?.click()} disabled={uploading}
+                className="rounded-full bg-[#1f1c19] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#66735f] disabled:opacity-50">
+                {uploading ? "Lädt hoch…" : "+ Bild hinzufügen"}
+              </button>
+              <input ref={uploadRef} type="file" accept="image/*" className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadNew(f); e.target.value = ""; }} />
+            </>
+          )}
+        </div>
       </div>
+
+      {/* Hidden replace input */}
+      <input ref={replaceRef} type="file" accept="image/*" className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          const img = images.find((i) => i.id === replacingId);
+          if (f && img) handleReplace(img, f);
+          e.target.value = "";
+        }} />
 
       {isStatic && (
         <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
-          ⚠️ Bitte zuerst das SQL-Setup in Supabase und den Speicher-Bucket einrichten – dann kannst du Bilder direkt hochladen und austauschen.
+          ⚠️ Bitte zuerst das SQL-Setup in Supabase ausführen – dann erscheint der „Jetzt einrichten"-Button.
+        </div>
+      )}
+
+      {aptId && !hasDBImages && !isStatic && (
+        <div className="mt-4 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
+          Klicke „Jetzt einrichten" um die aktuellen Bilder in Supabase zu übertragen. Danach kannst du einzelne Bilder ersetzen oder neue hochladen.
         </div>
       )}
 
@@ -142,29 +181,39 @@ export default function AdminBilder({ slug }: { slug: string }) {
                   alt={`Bild ${idx + 1}`}
                   fill
                   sizes="(max-width: 640px) 50vw, 25vw"
-                  className="object-cover"
+                  className="object-cover transition group-hover:brightness-50"
                   unoptimized={img.image_url.startsWith("http")}
                 />
               </div>
-              <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition group-hover:bg-black/40">
-                {!img.id.startsWith("static") && (
+
+              {/* Overlay-Buttons */}
+              {!img.id.startsWith("static") && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 transition group-hover:opacity-100">
+                  <button
+                    onClick={() => { setReplacingId(img.id); replaceRef.current?.click(); }}
+                    disabled={uploading}
+                    className="rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-[#1f1c19] shadow transition hover:bg-[#d8c7af]"
+                  >
+                    Ersetzen
+                  </button>
                   <button
                     onClick={() => handleDelete(img)}
-                    className="scale-75 rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition group-hover:scale-100 group-hover:opacity-100"
+                    className="rounded-full bg-red-500 px-4 py-1.5 text-xs font-semibold text-white shadow transition hover:bg-red-600"
                   >
                     Löschen
                   </button>
-                )}
-              </div>
-              <p className="absolute bottom-1 left-2 text-[10px] text-white/80 drop-shadow">#{idx + 1}</p>
+                </div>
+              )}
+
+              <p className="absolute bottom-1 left-2 text-[10px] font-semibold text-white/90 drop-shadow">#{idx + 1}</p>
             </div>
           ))}
         </div>
       )}
 
-      {!isStatic && (
+      {hasDBImages && (
         <p className="mt-4 text-xs text-stone-400">
-          Tipp: Das erste Bild wird als Hauptbild verwendet. Lösche Bilder und lade sie in der gewünschten Reihenfolge neu hoch.
+          Bild #1 wird als Titelbild verwendet. Reihenfolge ändern: altes Bild löschen, neues hochladen.
         </p>
       )}
     </div>
