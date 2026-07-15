@@ -119,7 +119,7 @@ export default function AdminBilder({ slug }: { slug: string }) {
           <p className="mt-1 text-sm text-stone-400">
             {hasDBImages
               ? "Hover über ein Bild → Ersetzen oder Löschen."
-              : "Klicke „Jetzt einrichten" um die aktuellen Bilder bearbeitbar zu machen."}
+              : "Klicke auf 'Jetzt einrichten' um die aktuellen Bilder bearbeitbar zu machen."}
           </p>
         </div>
         <div className="flex gap-2">
