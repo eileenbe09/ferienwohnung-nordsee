@@ -174,43 +174,15 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Preise – visuell mit Saison-Farbe */}
-              <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Preise 2026</p>
-                <div className="mt-4 space-y-3">
-                  {prices.map((item, index) => {
-                    const colors = [
-                      "border-l-[#c8ddc0] bg-[#f3f9f1]",
-                      "border-l-[#f5e0b0] bg-[#fdf8ee]",
-                      "border-l-[#f5c0a0] bg-[#fdf3ee]",
-                    ];
-                    const label =
-                      "label" in item && item.label
-                        ? item.label
-                        : item.start_date
-                        ? `${formatDate(item.start_date)} – ${formatDate(item.end_date ?? "")}`
-                        : "";
-                    const priceStr =
-                      "price" in item && item.price
-                        ? item.price
-                        : item.price_per_night
-                        ? `${new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(Number(item.price_per_night))} / Nacht`
-                        : "";
-                    return (
-                      <div
-                        key={item.id}
-                        className={`flex items-center justify-between rounded-2xl border-l-4 px-5 py-4 ${colors[index % colors.length]}`}
-                      >
-                        <p className="text-sm text-stone-600">{label}</p>
-                        <p className="text-base font-bold text-[#1f1c19]">{priceStr}</p>
-                      </div>
-                    );
-                  })}
+              {/* Kalender mit Preisen */}
+              {staticApt && (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Belegung & Preissaisons</p>
+                  <div className="mt-4">
+                    <AvailabilityCalendar prices={staticApt.prices} slug={slug} />
+                  </div>
                 </div>
-                <p className="mt-3 text-xs text-stone-400">
-                  * Endreinigung 75,00 € einmalig · Kurbeitrag nicht enthalten
-                </p>
-              </div>
+              )}
             </div>
 
             {/* RECHTE SPALTE – Sticky Sidebar */}
@@ -280,14 +252,6 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
               </div>
             </aside>
           </div>
-
-          {/* ── KALENDER ──────────────────────────────────────── */}
-          {staticApt && (
-            <div className="mt-10">
-              <p className="mb-4 text-xs uppercase tracking-[0.35em] text-[#66735f]">Belegung & Preissaisons</p>
-              <AvailabilityCalendar prices={staticApt.prices} slug={slug} />
-            </div>
-          )}
 
           {/* ── CTA BANNER ────────────────────────────────────── */}
           <div className="relative mt-10 overflow-hidden rounded-3xl">
