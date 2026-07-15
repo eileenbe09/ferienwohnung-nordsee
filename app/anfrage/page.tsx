@@ -1,6 +1,13 @@
 import Navbar from "@/components/Navbar";
+import AnfrageForm from "./AnfrageForm";
 
-export default function AnfragePage() {
+type PageProps = {
+  searchParams: Promise<Record<string, string>>;
+};
+
+export default async function AnfragePage({ searchParams }: PageProps) {
+  const params = await searchParams;
+
   return (
     <>
       {/* HEADER */}
@@ -66,84 +73,15 @@ export default function AnfragePage() {
             </div>
 
             {/* Rechts: Formular */}
-            <div className="rounded-3xl bg-white p-6 shadow-lg sm:p-8">
-              <h2 className="font-serif text-2xl text-[#1f1c19]">Deine Anfrage</h2>
-              <p className="mt-1 text-sm text-stone-400">Felder mit * sind Pflichtfelder.</p>
-
-              <form
-                action="https://formspree.io/f/placeholder"
-                method="POST"
-                className="mt-6 space-y-4"
-              >
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Vorname *</label>
-                    <input name="vorname" required type="text"
-                      className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Nachname *</label>
-                    <input name="nachname" required type="text"
-                      className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">E-Mail *</label>
-                    <input name="email" required type="email"
-                      className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Telefon</label>
-                    <input name="telefon" type="tel"
-                      className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Gewünschte Wohnung</label>
-                  <select name="wohnung"
-                    className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition">
-                    <option value="">Bitte wählen</option>
-                    <option value="Seerobbe">Ferienwohnung Seerobbe</option>
-                    <option value="Leuchtturm">Ferienwohnung Leuchtturm</option>
-                    <option value="Beide">Beide / egal</option>
-                  </select>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Anreise *</label>
-                    <input name="anreise" required type="date"
-                      className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Abreise *</label>
-                    <input name="abreise" required type="date"
-                      className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Anzahl Personen *</label>
-                  <input name="personen" required type="text" placeholder="z. B. 2 Erwachsene, 2 Kinder"
-                    className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
-                </div>
-
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Nachricht</label>
-                  <textarea name="nachricht" rows={4} placeholder="Weitere Wünsche oder Fragen..."
-                    className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition resize-none" />
-                </div>
-
-                <button type="submit"
-                  className="w-full rounded-full bg-[#1f1c19] py-3.5 text-sm font-semibold text-white transition hover:bg-[#66735f]">
-                  Anfrage absenden →
-                </button>
-                <p className="text-center text-xs text-stone-400">Wir melden uns innerhalb von 24 Stunden.</p>
-              </form>
-            </div>
+            <AnfrageForm
+              wohnung={params.wohnung}
+              anreise={params.anreise}
+              abreise={params.abreise}
+              personen={params.personen}
+              bettwaesche={params.bettwaesche}
+              handtuch={params.handtuch}
+              preis={params.preis}
+            />
           </div>
         </div>
       </div>
