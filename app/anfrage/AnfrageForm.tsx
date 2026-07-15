@@ -6,7 +6,9 @@ type Props = {
   wohnung?: string;
   anreise?: string;
   abreise?: string;
-  personen?: string;
+  erwachsene?: string;
+  kinder?: string;
+  kinderalter?: string;
   bettwaesche?: string;
   handtuch?: string;
   preis?: string;
@@ -17,18 +19,21 @@ const WOHNUNG_MAP: Record<string, string> = {
   leuchtturm: "Leuchtturm",
 };
 
-export default function AnfrageForm({ wohnung, anreise, abreise, personen, bettwaesche, handtuch, preis }: Props) {
+export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kinder, kinderalter, bettwaesche, handtuch, preis }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const wohnungLabel = wohnung ? (WOHNUNG_MAP[wohnung.toLowerCase()] ?? wohnung) : "";
 
-  const hasPrefill = !!(anreise || abreise || personen || preis);
+  const hasPrefill = !!(anreise || abreise || erwachsene || preis);
 
-  // Build a summary of extras
   const extraParts: string[] = [];
   if (bettwaesche === "ja") extraParts.push("Bettwäsche-Paket");
   if (handtuch === "ja") extraParts.push("Handtuch-Paket");
   const extrasStr = extraParts.length > 0 ? extraParts.join(", ") : "Keine";
+
+  const personenDisplay = erwachsene
+    ? `${erwachsene} Erwachsene${kinder && kinder !== "0" ? `, ${kinder} Kind${Number(kinder) !== 1 ? "er" : ""}${kinderalter && kinderalter !== "keine" ? ` (${kinderalter})` : ""}` : ""}`
+    : "";
 
   const nachrichtDefault = hasPrefill
     ? [
@@ -54,7 +59,8 @@ export default function AnfrageForm({ wohnung, anreise, abreise, personen, bettw
             {wohnungLabel && <div><span className="text-stone-400">Wohnung:</span> {wohnungLabel === "Seerobbe" ? "Ferienwohnung Seerobbe" : "Ferienwohnung Leuchtturm"}</div>}
             {anreise && <div><span className="text-stone-400">Anreise:</span> {new Date(anreise).toLocaleDateString("de-DE")}</div>}
             {abreise && <div><span className="text-stone-400">Abreise:</span> {new Date(abreise).toLocaleDateString("de-DE")}</div>}
-            {personen && <div><span className="text-stone-400">Personen:</span> {personen}</div>}
+            {erwachsene && <div><span className="text-stone-400">Erwachsene:</span> {erwachsene}</div>}
+            {kinder && kinder !== "0" && <div><span className="text-stone-400">Kinder:</span> {kinder}{kinderalter && kinderalter !== "keine" ? ` (${kinderalter})` : ""}</div>}
             {extraParts.length > 0 && <div className="col-span-2"><span className="text-stone-400">Extras:</span> {extrasStr}</div>}
             {preis && <div className="col-span-2 mt-1 font-semibold text-[#1f1c19]">Gesamtpreis: {preis}</div>}
           </div>
@@ -73,6 +79,7 @@ export default function AnfrageForm({ wohnung, anreise, abreise, personen, bettw
         {preis && <input type="hidden" name="berechneter_preis" value={preis} />}
         {bettwaesche && <input type="hidden" name="bettwaesche_paket" value={bettwaesche} />}
         {handtuch && <input type="hidden" name="handtuch_paket" value={handtuch} />}
+        {kinderalter && kinderalter !== "keine" && <input type="hidden" name="kinderalter" value={kinderalter} />}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -127,7 +134,7 @@ export default function AnfrageForm({ wohnung, anreise, abreise, personen, bettw
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Anzahl Personen *</label>
           <input name="personen" required type="text"
-            defaultValue={personen ? `${personen} Person${Number(personen) !== 1 ? "en" : ""}` : ""}
+            defaultValue={personenDisplay}
             placeholder="z. B. 2 Erwachsene, 2 Kinder"
             className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
         </div>

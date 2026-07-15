@@ -77,7 +77,9 @@ export default async function AnfragePage({ searchParams }: PageProps) {
               wohnung={params.wohnung}
               anreise={params.anreise}
               abreise={params.abreise}
-              personen={params.personen}
+              erwachsene={params.erwachsene}
+              kinder={params.kinder}
+              kinderalter={params.kinderalter}
               bettwaesche={params.bettwaesche}
               handtuch={params.handtuch}
               preis={params.preis}

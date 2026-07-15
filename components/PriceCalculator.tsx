@@ -12,7 +12,7 @@ type PricePeriod = {
 type Props = {
   slug: string;
   prices: PricePeriod[];
-  finalCleaning?: string; // "75,00 € einmalig"
+  finalCleaning?: string;
 };
 
 function parseDE(str: string): Date {
@@ -42,7 +42,48 @@ function daysBetween(a: Date, b: Date) {
   return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
 
-const PERSON_OPTIONS = [1, 2, 3, 4, 5];
+const MAX_PERSONS = 5;
+
+function Counter({
+  label,
+  value,
+  onInc,
+  onDec,
+  disableInc,
+}: {
+  label: string;
+  value: number;
+  onInc: () => void;
+  onDec: () => void;
+  disableInc: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3">
+      <span className="text-sm text-stone-700">{label}</span>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onDec}
+          disabled={value <= 0}
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-stone-300 text-stone-600 transition hover:bg-stone-200 disabled:opacity-30"
+        >
+          −
+        </button>
+        <span className="w-4 text-center text-sm font-bold text-[#1f1c19]">{value}</span>
+        <button
+          type="button"
+          onClick={onInc}
+          disabled={disableInc}
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-stone-300 text-stone-600 transition hover:bg-stone-200 disabled:opacity-30"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const CHILD_AGE_OPTIONS = Array.from({ length: 18 }, (_, i) => i); // 0–17
 
 export default function PriceCalculator({ slug, prices, finalCleaning }: Props) {
   const router = useRouter();
@@ -50,12 +91,24 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
-  const [persons, setPersons] = useState(2);
+  const [adults, setAdults] = useState(2);
+  const [childAges, setChildAges] = useState<number[]>([]); // one entry per child
   const [wantsBettwaesche, setWantsBettwaesche] = useState(false);
   const [wantsHandtuch, setWantsHandtuch] = useState(false);
 
+  const totalPersons = adults + childAges.length;
   const cleaning = parsePriceNum(finalCleaning ?? "75");
-  const extraPerNight = persons >= 5 ? 10 : 0;
+  const extraPerNight = totalPersons >= MAX_PERSONS ? 10 : 0;
+
+  function addChild() {
+    if (totalPersons < MAX_PERSONS) setChildAges((prev) => [...prev, 5]);
+  }
+  function removeChild() {
+    setChildAges((prev) => prev.slice(0, -1));
+  }
+  function setChildAge(idx: number, age: number) {
+    setChildAges((prev) => prev.map((a, i) => (i === idx ? age : a)));
+  }
 
   const calc = useMemo(() => {
     if (!checkIn || !checkOut) return null;
@@ -65,9 +118,6 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
     if (nights <= 0) return null;
 
     let baseTotal = 0;
-    const breakdown: { label: string; nights: number; price: number }[] = [];
-
-    // Nächte aufschlüsseln nach Saison
     const current = new Date(from);
     const periodGroups: Record<string, { nights: number; pricePerNight: number }> = {};
     for (let i = 0; i < nights; i++) {
@@ -79,6 +129,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
       current.setDate(current.getDate() + 1);
     }
 
+    const breakdown: { label: string; nights: number; price: number }[] = [];
     Object.entries(periodGroups).forEach(([, v]) => {
       if (v.pricePerNight > 0) {
         breakdown.push({ label: `${formatEUR(v.pricePerNight)} / Nacht`, nights: v.nights, price: v.nights * v.pricePerNight });
@@ -86,19 +137,25 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
     });
 
     const extraTotal = extraPerNight * nights;
-    const bettwaescheTotal = wantsBettwaesche ? 9 * persons : 0;
-    const handtuchTotal = wantsHandtuch ? 5 * persons : 0;
+    const bettwaescheTotal = wantsBettwaesche ? 9 * totalPersons : 0;
+    const handtuchTotal = wantsHandtuch ? 5 * totalPersons : 0;
     const total = baseTotal + extraTotal + cleaning + bettwaescheTotal + handtuchTotal;
 
     return { nights, breakdown, baseTotal, extraTotal, bettwaescheTotal, handtuchTotal, total };
-  }, [checkIn, checkOut, persons, wantsBettwaesche, wantsHandtuch, prices, cleaning, extraPerNight]);
+  }, [checkIn, checkOut, totalPersons, wantsBettwaesche, wantsHandtuch, prices, cleaning, extraPerNight]);
 
   function handleAnfrage() {
+    const childrenStr = childAges.length > 0
+      ? childAges.map((a) => `${a} J.`).join(", ")
+      : "keine";
+
     const params = new URLSearchParams({
       wohnung: slug,
       anreise: checkIn,
       abreise: checkOut,
-      personen: persons.toString(),
+      erwachsene: adults.toString(),
+      kinder: childAges.length.toString(),
+      kinderalter: childrenStr,
       bettwaesche: wantsBettwaesche ? "ja" : "nein",
       handtuch: wantsHandtuch ? "ja" : "nein",
       preis: calc ? formatEUR(calc.total) : "",
@@ -137,27 +194,55 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
 
       {/* Personen */}
       <div className="mt-4">
-        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-stone-500">
-          Personen (max. 5)
-        </label>
-        <div className="flex gap-2">
-          {PERSON_OPTIONS.map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setPersons(n)}
-              className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold transition ${
-                persons === n
-                  ? "bg-[#1f1c19] text-white"
-                  : "bg-[#f7f3ec] text-stone-600 hover:bg-stone-200"
-              }`}
-            >
-              {n}
-            </button>
-          ))}
+        <div className="mb-2 flex items-center justify-between">
+          <label className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+            Personen
+          </label>
+          <span className={`text-xs font-semibold ${totalPersons >= MAX_PERSONS ? "text-amber-600" : "text-stone-400"}`}>
+            {totalPersons} / {MAX_PERSONS} Personen
+          </span>
         </div>
-        {persons >= 5 && (
-          <p className="mt-1.5 text-xs text-[#66735f]">+ 10,00 € / Nacht für die 5. Person</p>
+
+        <div className="space-y-2">
+          <Counter
+            label="Erwachsene"
+            value={adults}
+            onInc={() => { if (totalPersons < MAX_PERSONS) setAdults((n) => n + 1); }}
+            onDec={() => { if (adults > 1) setAdults((n) => n - 1); }}
+            disableInc={totalPersons >= MAX_PERSONS}
+          />
+          <Counter
+            label="Kinder"
+            value={childAges.length}
+            onInc={addChild}
+            onDec={removeChild}
+            disableInc={totalPersons >= MAX_PERSONS}
+          />
+        </div>
+
+        {/* Kinderalter */}
+        {childAges.length > 0 && (
+          <div className="mt-3 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Alter der Kinder</p>
+            {childAges.map((age, idx) => (
+              <div key={idx} className="flex items-center gap-3 rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-2.5">
+                <span className="flex-1 text-sm text-stone-600">Kind {idx + 1}</span>
+                <select
+                  value={age}
+                  onChange={(e) => setChildAge(idx, Number(e.target.value))}
+                  className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] transition"
+                >
+                  {CHILD_AGE_OPTIONS.map((a) => (
+                    <option key={a} value={a}>{a} Jahr{a !== 1 ? "e" : ""}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {totalPersons >= MAX_PERSONS && (
+          <p className="mt-1.5 text-xs text-amber-600 font-medium">Maximale Belegung (5 Personen) erreicht · +10,00 € / Nacht</p>
         )}
       </div>
 
@@ -223,13 +308,13 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
             </div>
             {calc.bettwaescheTotal > 0 && (
               <div className="flex justify-between text-sm text-stone-600">
-                <span>Bettwäsche ({persons} × 9,00 €)</span>
+                <span>Bettwäsche ({totalPersons} × 9,00 €)</span>
                 <span>{formatEUR(calc.bettwaescheTotal)}</span>
               </div>
             )}
             {calc.handtuchTotal > 0 && (
               <div className="flex justify-between text-sm text-stone-600">
-                <span>Handtücher ({persons} × 5,00 €)</span>
+                <span>Handtücher ({totalPersons} × 5,00 €)</span>
                 <span>{formatEUR(calc.handtuchTotal)}</span>
               </div>
             )}
