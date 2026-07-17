@@ -2,52 +2,50 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 
-type ApartmentRow = {
-  id: number;
-  name: string;
-  slug: string;
-  short_description: string | null;
-  guests: string | null;
-  size: number | null;
-  coverImage: { image_url: string }[] | null;
-};
-
-const fallback = [
+const STATIC_FALLBACK = [
   {
     id: 1,
     name: "Ferienwohnung Seerobbe",
     slug: "seerobbe",
-    short_description:
-      "Ruhige, kinderfreundliche Ferienwohnung mit Terrasse, Spielwiese und zwei Schlafzimmern.",
+    short_description: "Ruhige, kinderfreundliche Ferienwohnung mit Terrasse, Spielwiese und zwei Schlafzimmern.",
     guests: "Bis zu 5 Personen",
     size: 60,
-    coverImage: [{ image_url: "/images/fewo1.1.avif" }],
+    coverImage: "/images/fewo1.1.avif",
   },
   {
     id: 2,
     name: "Ferienwohnung Leuchtturm",
     slug: "leuchtturm",
-    short_description:
-      "Gemütliche Wohnung mit kleinem Gartenstück und voll ausgestatteter Küche.",
+    short_description: "Gemütliche Wohnung mit kleinem Gartenstück und voll ausgestatteter Küche.",
     guests: "Bis zu 5 Personen",
     size: 60,
-    coverImage: [{ image_url: "/images/fewo2.avif" }],
+    coverImage: "/images/fewo2.avif",
   },
 ];
 
 export default async function WohnungenPage() {
-  const { data: apartments } = await supabase
+  // Wohnungsdaten aus Supabase laden
+  const { data: dbApartments } = await supabase
     .from("apartments")
-    .select(`id, name, slug, short_description, guests, size,
-      coverImage:apartment_images!apartment_id(image_url, is_cover)`)
-    .eq("is_active", true)
-    .eq("coverImage.is_cover", true)
-    .order("name", { ascending: true });
+    .select("id, name, slug, short_description, guests, size")
+    .order("id", { ascending: true });
 
-  const typedApartments =
-    (apartments as ApartmentRow[] | null)?.length
-      ? (apartments as ApartmentRow[])
-      : fallback;
+  // Erstes Bild je Wohnung laden
+  const { data: dbImages } = await supabase
+    .from("apartment_images")
+    .select("apartment_id, image_url, sort_order")
+    .order("sort_order", { ascending: true });
+
+  const apartments =
+    dbApartments && dbApartments.length > 0
+      ? dbApartments.map((apt) => ({
+          ...apt,
+          coverImage:
+            dbImages?.find((img) => img.apartment_id === apt.id)?.image_url ??
+            STATIC_FALLBACK.find((f) => f.slug === apt.slug)?.coverImage ??
+            "/images/hero1.avif",
+        }))
+      : STATIC_FALLBACK;
 
   return (
     <>
@@ -92,8 +90,8 @@ export default async function WohnungenPage() {
       {/* WOHNUNGEN */}
       <section className="bg-[#f7f3ec] px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-6xl space-y-10">
-          {typedApartments.map((apt, i) => {
-            const img = apt.coverImage?.[0]?.image_url || "/images/hero1.avif";
+          {apartments.map((apt, i) => {
+            const img = apt.coverImage;
             const isEven = i % 2 === 0;
             return (
               <div key={apt.id} className="group overflow-hidden rounded-3xl bg-white shadow-lg transition hover:shadow-xl">
@@ -112,9 +110,7 @@ export default async function WohnungenPage() {
                       <span className="inline-block rounded-full bg-[#66735f]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#66735f]">
                         Ferienwohnung
                       </span>
-                      <h2 className="mt-3 font-serif text-3xl text-[#1f1c19] sm:text-4xl">
-                        {apt.name}
-                      </h2>
+                      <h2 className="mt-3 font-serif text-3xl text-[#1f1c19] sm:text-4xl">{apt.name}</h2>
                       <p className="mt-3 leading-7 text-stone-500">{apt.short_description}</p>
                     </div>
 
@@ -158,9 +154,7 @@ export default async function WohnungenPage() {
       <section className="bg-[#1f1c19] px-4 py-16 text-center text-white sm:px-6 sm:py-20">
         <div className="mx-auto max-w-xl">
           <p className="text-xs uppercase tracking-[0.4em] text-[#d8c7af]">Bereit für den Urlaub?</p>
-          <h2 className="mt-4 font-serif text-3xl italic sm:text-4xl">
-            Jetzt unverbindlich anfragen
-          </h2>
+          <h2 className="mt-4 font-serif text-3xl italic sm:text-4xl">Jetzt unverbindlich anfragen</h2>
           <p className="mt-4 text-stone-400">Schnelle und persönliche Antwort garantiert.</p>
           <Link
             href="/anfrage"
