@@ -41,13 +41,13 @@ export default function Footer() {
               Kontakt
             </p>
             <ul className="mt-4 space-y-2.5 text-sm text-stone-400">
-              <li>Altfunnixsiel, 26427 Niedersachsen</li>
+              <li>Altfunnixsiel, 26409 Wittmund</li>
               <li>
                 <a
-                  href="mailto:info@ferienwohnungen-lojdl.de"
+                  href="mailto:info@altfunnixsiel-ferien.de"
                   className="hover:text-white transition"
                 >
-                  info@ferienwohnungen-lojdl.de
+                  info@altfunnixsiel-ferien.de
                 </a>
               </li>
             </ul>

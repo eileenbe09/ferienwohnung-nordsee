@@ -35,13 +35,13 @@ export default async function AnfragePage({ searchParams }: PageProps) {
                 {
                   icon: "📍",
                   title: "Adresse",
-                  text: "Altfunnixsiel\n26427 Neuharlingersiel\nNiedersachsen",
+                  text: "Altfunnixsiel\n26409 Wittmund\nNiedersachsen",
                 },
                 {
                   icon: "✉️",
                   title: "E-Mail",
-                  text: "info@ferienwohnungen-lojdl.de",
-                  href: "mailto:info@ferienwohnungen-lojdl.de",
+                  text: "info@altfunnixsiel-ferien.de",
+                  href: "mailto:info@altfunnixsiel-ferien.de",
                 },
                 {
                   icon: "🏖️",

@@ -26,13 +26,13 @@ export default function KontaktPage() {
               {
                 icon: "📍",
                 title: "Adresse",
-                lines: ["Altfunnixsiel", "26427 Neuharlingersiel", "Niedersachsen"],
+                lines: ["Altfunnixsiel", "26409 Wittmund", "Niedersachsen"],
               },
               {
                 icon: "✉️",
                 title: "E-Mail",
-                lines: ["info@ferienwohnungen-lojdl.de"],
-                href: "mailto:info@ferienwohnungen-lojdl.de",
+                lines: ["info@altfunnixsiel-ferien.de"],
+                href: "mailto:info@altfunnixsiel-ferien.de",
                 sub: "Antwort innerhalb von 24 Stunden",
               },
               {
@@ -79,15 +79,15 @@ export default function KontaktPage() {
             <h2 className="font-serif text-2xl text-[#1f1c19]">Impressum</h2>
             <div className="mt-4 space-y-1 text-sm leading-7 text-stone-500">
               <p className="font-semibold text-[#1f1c19]">Ferienwohnungen Lojdl</p>
-              <p>Altfunnixsiel, 26427 Neuharlingersiel, Niedersachsen</p>
+              <p>Altfunnixsiel, 26409 Wittmund, Niedersachsen</p>
               <p>
                 E-Mail:{" "}
-                <a href="mailto:info@ferienwohnungen-lojdl.de" className="hover:text-[#66735f] transition">
-                  info@ferienwohnungen-lojdl.de
+                <a href="mailto:info@altfunnixsiel-ferien.de" className="hover:text-[#66735f] transition">
+                  info@altfunnixsiel-ferien.de
                 </a>
               </p>
               <p className="pt-3 text-xs text-stone-400">
-                Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Ferienwohnungen Lojdl, Altfunnixsiel, 26427 Niedersachsen
+                Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Ferienwohnungen Lojdl, Altfunnixsiel, 26409 Wittmund
               </p>
             </div>
           </div>
