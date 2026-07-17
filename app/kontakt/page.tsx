@@ -90,6 +90,15 @@ export default function KontaktPage() {
               <p className="pt-3 text-xs text-stone-400">
                 Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Manuela Lojdl, Fritz-Reuterstraße 13, 46244 Bottrop
               </p>
+              <div className="pt-4 border-t border-stone-100 mt-4">
+                <p className="font-semibold text-[#1f1c19] text-sm">Verantwortlich für Gestaltung, Umsetzung und technische Betreuung</p>
+                <div className="mt-2 space-y-0.5 text-sm text-stone-500">
+                  <p>Eileen Partus</p>
+                  <p>Telefon: 015567596190</p>
+                  <p>E-Mail: <a href="mailto:partus@tsz-wulfen.de" className="hover:text-[#66735f] transition">partus@tsz-wulfen.de</a></p>
+                  <p>Instagram: <a href="https://instagram.com/eileen_be" target="_blank" rel="noopener noreferrer" className="hover:text-[#66735f] transition">@eileen_be</a></p>
+                </div>
+              </div>
             </div>
           </div>
 
