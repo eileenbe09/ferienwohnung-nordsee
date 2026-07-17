@@ -78,8 +78,9 @@ export default function KontaktPage() {
           <div className="mt-8 rounded-3xl bg-white p-7 shadow-sm sm:p-10">
             <h2 className="font-serif text-2xl text-[#1f1c19]">Impressum</h2>
             <div className="mt-4 space-y-1 text-sm leading-7 text-stone-500">
-              <p className="font-semibold text-[#1f1c19]">Ferienwohnungen Lojdl</p>
-              <p>Altfunnixsiel, 26409 Wittmund, Niedersachsen</p>
+              <p className="font-semibold text-[#1f1c19]">Manuela Lojdl</p>
+              <p>Fritz-Reuterstraße 13</p>
+              <p>46244 Bottrop (Kirchhellen)</p>
               <p>
                 E-Mail:{" "}
                 <a href="mailto:info@altfunnixsiel-ferien.de" className="hover:text-[#66735f] transition">
@@ -87,7 +88,7 @@ export default function KontaktPage() {
                 </a>
               </p>
               <p className="pt-3 text-xs text-stone-400">
-                Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Ferienwohnungen Lojdl, Altfunnixsiel, 26409 Wittmund
+                Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Manuela Lojdl, Fritz-Reuterstraße 13, 46244 Bottrop
               </p>
             </div>
           </div>
