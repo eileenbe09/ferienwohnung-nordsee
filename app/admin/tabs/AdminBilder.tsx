@@ -12,7 +12,9 @@ export default function AdminBilder({ slug }: { slug: string }) {
   const staticApt = staticApartments.find((a) => a.slug === slug)!;
   const uploadRef = useRef<HTMLInputElement>(null);
   const replaceRef = useRef<HTMLInputElement>(null);
+  const dragIdRef = useRef<string | null>(null);
   const [replacingId, setReplacingId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   const [aptId, setAptId] = useState<number | null>(null);
   const [images, setImages] = useState<AptImage[]>([]);
@@ -49,7 +51,7 @@ export default function AdminBilder({ slug }: { slug: string }) {
     const { data, error } = await supabase.from("apartment_images").insert(rows).select();
     if (!error && data) {
       setImages(data as AptImage[]);
-      flash("✓ Bilder übertragen – du kannst sie jetzt ersetzen oder löschen.");
+      flash("✓ Bilder übertragen – du kannst sie jetzt neu anordnen, ersetzen oder löschen.");
     } else flash("Fehler beim Übertragen.");
     setSeeding(false);
   }
@@ -58,7 +60,7 @@ export default function AdminBilder({ slug }: { slug: string }) {
     const ext = file.name.split(".").pop();
     const filename = `${slug}/${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("apartment-images").upload(filename, file, { contentType: file.type });
-    if (error) { flash("Upload-Fehler. Ist der Supabase-Speicher eingerichtet?"); return null; }
+    if (error) { flash("Upload-Fehler. Sind die Storage-Policies eingerichtet?"); return null; }
     const { data } = supabase.storage.from("apartment-images").getPublicUrl(filename);
     return data.publicUrl;
   }
@@ -68,7 +70,7 @@ export default function AdminBilder({ slug }: { slug: string }) {
     setUploading(true);
     const url = await uploadFile(file);
     if (url) {
-      const nextOrder = images.filter((i) => !i.id.startsWith("static")).length;
+      const nextOrder = images.length;
       const { data, error } = await supabase
         .from("apartment_images")
         .insert({ apartment_id: aptId, image_url: url, sort_order: nextOrder })
@@ -85,7 +87,6 @@ export default function AdminBilder({ slug }: { slug: string }) {
     setUploading(true);
     const url = await uploadFile(file);
     if (url) {
-      // Remove old storage file if it was a storage URL
       if (img.image_url.includes("apartment-images/")) {
         const path = img.image_url.split("/apartment-images/")[1];
         if (path) await supabase.storage.from("apartment-images").remove([path]);
@@ -105,7 +106,50 @@ export default function AdminBilder({ slug }: { slug: string }) {
       if (path) await supabase.storage.from("apartment-images").remove([path]);
     }
     await supabase.from("apartment_images").delete().eq("id", img.id);
-    setImages((prev) => prev.filter((i) => i.id !== img.id));
+    const remaining = images.filter((i) => i.id !== img.id);
+    // Reihenfolge neu durchnummerieren
+    const reordered = remaining.map((img, idx) => ({ ...img, sort_order: idx }));
+    await saveOrder(reordered);
+    setImages(reordered);
+  }
+
+  // Drag & Drop
+  function onDragStart(id: string) {
+    dragIdRef.current = id;
+  }
+
+  function onDragOver(e: React.DragEvent, id: string) {
+    e.preventDefault();
+    setDragOverId(id);
+  }
+
+  async function onDrop(e: React.DragEvent, targetId: string) {
+    e.preventDefault();
+    setDragOverId(null);
+    const fromId = dragIdRef.current;
+    if (!fromId || fromId === targetId) return;
+
+    const fromIdx = images.findIndex((i) => i.id === fromId);
+    const toIdx = images.findIndex((i) => i.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+
+    const reordered = [...images];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+    const withNewOrder = reordered.map((img, idx) => ({ ...img, sort_order: idx }));
+
+    setImages(withNewOrder);
+    await saveOrder(withNewOrder);
+    flash("✓ Reihenfolge gespeichert.");
+  }
+
+  async function saveOrder(list: AptImage[]) {
+    // Alle sort_order Werte in einem Batch updaten
+    await Promise.all(
+      list
+        .filter((i) => !i.id.startsWith("static"))
+        .map((img) => supabase.from("apartment_images").update({ sort_order: img.sort_order }).eq("id", img.id))
+    );
   }
 
   function flash(text: string) { setMsg(text); setTimeout(() => setMsg(""), 4000); }
@@ -118,8 +162,8 @@ export default function AdminBilder({ slug }: { slug: string }) {
           <h2 className="font-serif text-2xl text-[#1f1c19]">Bilder</h2>
           <p className="mt-1 text-sm text-stone-400">
             {hasDBImages
-              ? "Hover über ein Bild → Ersetzen oder Löschen."
-              : "Klicke auf 'Jetzt einrichten' um die aktuellen Bilder bearbeitbar zu machen."}
+              ? "Ziehen zum Anordnen · Hover → Ersetzen / Löschen · Bild #1 = Titelbild"
+              : "Klicke 'Jetzt einrichten' um die aktuellen Bilder bearbeitbar zu machen."}
           </p>
         </div>
         <div className="flex gap-2">
@@ -142,7 +186,6 @@ export default function AdminBilder({ slug }: { slug: string }) {
         </div>
       </div>
 
-      {/* Hidden replace input */}
       <input ref={replaceRef} type="file" accept="image/*" className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];
@@ -156,13 +199,11 @@ export default function AdminBilder({ slug }: { slug: string }) {
           ⚠️ Bitte zuerst das SQL-Setup in Supabase ausführen – dann erscheint der „Jetzt einrichten"-Button.
         </div>
       )}
-
-      {aptId && !hasDBImages && !isStatic && (
+      {aptId && !hasDBImages && (
         <div className="mt-4 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
-          Klicke „Jetzt einrichten" um die aktuellen Bilder in Supabase zu übertragen. Danach kannst du einzelne Bilder ersetzen oder neue hochladen.
+          Klicke „Jetzt einrichten" um die aktuellen Bilder in Supabase zu übertragen.
         </div>
       )}
-
       {msg && (
         <div className={`mt-4 rounded-xl px-4 py-3 text-sm font-medium ${msg.startsWith("✓") ? "bg-[#66735f]/10 text-[#66735f]" : "bg-red-50 text-red-600"}`}>
           {msg}
@@ -174,7 +215,18 @@ export default function AdminBilder({ slug }: { slug: string }) {
       ) : (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {images.map((img, idx) => (
-            <div key={img.id} className="group relative overflow-hidden rounded-2xl bg-[#f7f3ec]">
+            <div
+              key={img.id}
+              draggable={!img.id.startsWith("static")}
+              onDragStart={() => onDragStart(img.id)}
+              onDragOver={(e) => onDragOver(e, img.id)}
+              onDragLeave={() => setDragOverId(null)}
+              onDrop={(e) => onDrop(e, img.id)}
+              className={`group relative overflow-hidden rounded-2xl bg-[#f7f3ec] transition
+                ${!img.id.startsWith("static") ? "cursor-grab active:cursor-grabbing" : ""}
+                ${dragOverId === img.id ? "ring-2 ring-[#66735f] ring-offset-2 scale-95" : ""}
+              `}
+            >
               <div className="relative aspect-[4/3] w-full">
                 <Image
                   src={img.image_url}
@@ -183,10 +235,10 @@ export default function AdminBilder({ slug }: { slug: string }) {
                   sizes="(max-width: 640px) 50vw, 25vw"
                   className="object-cover transition group-hover:brightness-50"
                   unoptimized={img.image_url.startsWith("http")}
+                  draggable={false}
                 />
               </div>
 
-              {/* Overlay-Buttons */}
               {!img.id.startsWith("static") && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 transition group-hover:opacity-100">
                   <button
@@ -205,16 +257,21 @@ export default function AdminBilder({ slug }: { slug: string }) {
                 </div>
               )}
 
-              <p className="absolute bottom-1 left-2 text-[10px] font-semibold text-white/90 drop-shadow">#{idx + 1}</p>
+              <div className="absolute bottom-1 left-2 flex items-center gap-1">
+                <p className="text-[10px] font-semibold text-white/90 drop-shadow">#{idx + 1}</p>
+                {idx === 0 && (
+                  <span className="rounded bg-[#d8c7af] px-1 text-[8px] font-bold text-[#1f1c19]">TITEL</span>
+                )}
+              </div>
+
+              {!img.id.startsWith("static") && (
+                <div className="absolute right-2 top-2 opacity-0 transition group-hover:opacity-0 text-white/60 text-xs select-none">
+                  ⠿
+                </div>
+              )}
             </div>
           ))}
         </div>
-      )}
-
-      {hasDBImages && (
-        <p className="mt-4 text-xs text-stone-400">
-          Bild #1 wird als Titelbild verwendet. Reihenfolge ändern: altes Bild löschen, neues hochladen.
-        </p>
       )}
     </div>
   );
