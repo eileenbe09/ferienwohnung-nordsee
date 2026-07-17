@@ -61,7 +61,7 @@ export const apartments = [
     slug: "leuchtturm",
     shortDescription:
       "Kinderfreundliche Ferienwohnung in ruhiger Feldrandlage mit kleinem Gartenstück und voll ausgestatteter Küche.",
-    guests: "2 Erwachsene, 2 Kinder + 1 Kleinkind bis 3 Jahre",
+    guests: "4 Personen + 1 Kind bis 3 Jahren",
     size: 60,
     image: "/images/fewo2.avif",
     gallery: [
