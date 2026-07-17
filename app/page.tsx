@@ -13,18 +13,35 @@ type ApartmentRow = {
   coverImage: { image_url: string }[] | null;
 };
 
-export default async function Home() {
-  const { data: apartments } = await supabase
-    .from("apartments")
-    .select(`
-      id, name, slug, short_description, guests, size,
-      coverImage:apartment_images!apartment_id(image_url, is_cover)
-    `)
-    .eq("is_active", true)
-    .eq("coverImage.is_cover", true)
-    .order("name", { ascending: true });
+const STATIC_COVER: Record<string, string> = {
+  seerobbe: "/images/fewo1.1.avif",
+  leuchtturm: "/images/fewo2.avif",
+};
 
-  const typedApartments = (apartments ?? []) as ApartmentRow[];
+export default async function Home() {
+  const { data: dbApartments } = await supabase
+    .from("apartments")
+    .select("id, name, slug, short_description, guests, size")
+    .order("id", { ascending: true });
+
+  const { data: dbImages } = await supabase
+    .from("apartment_images")
+    .select("apartment_id, image_url, sort_order")
+    .order("sort_order", { ascending: true });
+
+  const typedApartments =
+    dbApartments && dbApartments.length > 0
+      ? dbApartments.map((apt) => ({
+          ...apt,
+          coverImage:
+            dbImages?.find((img) => img.apartment_id === apt.id)?.image_url ??
+            STATIC_COVER[apt.slug] ??
+            "/images/hero1.avif",
+        }))
+      : [
+          { id: 1, name: "Ferienwohnung Seerobbe", slug: "seerobbe", short_description: "Ruhige, kinderfreundliche Ferienwohnung mit Terrasse und Spielwiese.", guests: "Bis zu 5 Personen", size: 60, coverImage: "/images/fewo1.1.avif" },
+          { id: 2, name: "Ferienwohnung Leuchtturm", slug: "leuchtturm", short_description: "Gemütliche Wohnung mit kleinem Garten und voll ausgestatteter Küche.", guests: "Bis zu 5 Personen", size: 60, coverImage: "/images/fewo2.avif" },
+        ];
 
   return (
     <>
@@ -129,7 +146,7 @@ export default async function Home() {
           <div className="mt-14 grid gap-8 lg:grid-cols-2">
             {typedApartments.length > 0
               ? typedApartments.map((apt) => {
-                  const img = apt.coverImage?.[0]?.image_url || "/images/hero1.avif";
+                  const img = apt.coverImage || "/images/hero1.avif";
                   return (
                     <Link
                       key={apt.id}
@@ -298,11 +315,11 @@ export default async function Home() {
               />
               <div
                 className="h-40 rounded-[2rem] bg-cover bg-center shadow-lg sm:h-48"
-                style={{ backgroundImage: "url('/images/fewo1.1.avif')" }}
+                style={{ backgroundImage: `url('${typedApartments.find(a => a.slug === "seerobbe")?.coverImage ?? "/images/fewo1.1.avif"}')` }}
               />
               <div
                 className="h-40 rounded-[2rem] bg-cover bg-center shadow-lg sm:h-48"
-                style={{ backgroundImage: "url('/images/fewo2.1.avif')" }}
+                style={{ backgroundImage: `url('${typedApartments.find(a => a.slug === "leuchtturm")?.coverImage ?? "/images/fewo2.avif"}')` }}
               />
             </div>
           </div>
