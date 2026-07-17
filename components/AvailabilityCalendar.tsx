@@ -154,34 +154,16 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
             >
               <span className={`text-sm font-bold leading-none ${isPast && !booked ? "opacity-40" : ""} ${booked ? "line-through opacity-80" : ""}`}>{day}</span>
               {booked ? (
-                <span className="mt-0.5 text-[9px] font-semibold leading-none text-red-100">Belegt</span>
+                <span className="mt-0.5 text-[10px] font-semibold leading-none text-red-100">Belegt</span>
               ) : dayPrice ? (
-                <span className="mt-0.5 text-[9px] leading-none opacity-70">{dayPrice}</span>
+                <span className="mt-0.5 text-[11px] leading-none opacity-70">{dayPrice}</span>
               ) : null}
             </div>
           );
         })}
       </div>
 
-      {/* Legende */}
-      <div className="mt-5 flex flex-wrap gap-3 border-t border-stone-100 pt-4">
-        <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-sm bg-red-500" />
-          <span className="text-xs font-semibold text-red-600">Belegt</span>
-        </div>
-        {uniquePrices.map((price, i) => (
-          <div key={price} className="flex items-center gap-1.5">
-            <div className={`h-3 w-3 rounded-sm ${SEASON_COLORS[Math.min(i, SEASON_COLORS.length - 1)].split(" ")[0]}`} />
-            <span className="text-xs text-stone-500">{price}</span>
-          </div>
-        ))}
-        <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-sm bg-stone-100" />
-          <span className="text-xs text-stone-400">Außerhalb Saison</span>
-        </div>
-      </div>
-
-      <p className="mt-4 text-xs text-stone-400">
+      <p className="mt-5 text-xs text-stone-400">
         Rote Tage sind bereits vergeben. Für Anfragen bitte direkt Kontakt aufnehmen.
       </p>
 
