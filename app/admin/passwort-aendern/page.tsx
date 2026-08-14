@@ -14,14 +14,15 @@ export default function PasswortAendernPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Prüfen ob eingeloggt (entweder normaler Login mit Flag, oder Reset-Link)
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        router.replace("/admin/login");
-      } else {
+    // Auf Auth-State warten — funktioniert sowohl für Recovery-Links als auch normalen Login
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
         setReady(true);
+      } else if (event === "INITIAL_SESSION" && !session) {
+        router.replace("/admin/login");
       }
     });
+    return () => subscription.unsubscribe();
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -43,7 +44,7 @@ export default function PasswortAendernPage() {
     });
 
     if (updateError) {
-      setError("Fehler beim Speichern: " + updateError.message);
+      setError("Fehler: " + updateError.message);
       setLoading(false);
     } else {
       router.replace("/admin");
@@ -51,7 +52,13 @@ export default function PasswortAendernPage() {
     }
   }
 
-  if (!ready) return null;
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#1f1c19]">
+        <p className="text-stone-400 text-sm">Laden…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#1f1c19] px-4">
