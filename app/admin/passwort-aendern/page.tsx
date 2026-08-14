@@ -1,74 +1,92 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
-export default function LoginPage() {
+export default function PasswortAendernPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const supabase = createClient();
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
 
-  async function handleLogin(e: React.FormEvent) {
+  useEffect(() => {
+    // Prüfen ob eingeloggt (entweder normaler Login mit Flag, oder Reset-Link)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.replace("/admin/login");
+      } else {
+        setReady(true);
+      }
+    });
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (password.length < 8) {
+      setError("Das Passwort muss mindestens 8 Zeichen lang sein.");
+      return;
+    }
+    if (password !== confirm) {
+      setError("Die Passwörter stimmen nicht überein.");
+      return;
+    }
     setLoading(true);
     setError("");
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError("E-Mail oder Passwort falsch.");
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password,
+      data: { must_change_password: false },
+    });
+
+    if (updateError) {
+      setError("Fehler beim Speichern: " + updateError.message);
       setLoading(false);
     } else {
-      // Beim ersten Login (Vorläufig-Passwort) zur Passwort-Änderung weiterleiten
-      if (data.user?.user_metadata?.must_change_password) {
-        router.push("/admin/passwort-aendern");
-      } else {
-        router.push("/admin");
-        router.refresh();
-      }
+      router.replace("/admin");
+      router.refresh();
     }
   }
+
+  if (!ready) return null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#1f1c19] px-4">
       <div className="w-full max-w-sm">
         <div className="text-center">
-          <p className="font-serif text-2xl italic text-white">Nordsee Ferienwohnungen</p>
-          <p className="mt-1 text-sm text-stone-400">Admin-Bereich</p>
+          <p className="font-serif text-2xl italic text-white">Neues Passwort</p>
+          <p className="mt-1 text-sm text-stone-400">Bitte wähle ein persönliches Passwort.</p>
         </div>
 
-        <form onSubmit={handleLogin} className="mt-8 space-y-4 rounded-3xl bg-white p-8">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-3xl bg-white p-8">
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">
-              E-Mail
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition"
-            />
-          </div>
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">
-              Passwort
+              Neues Passwort
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={8}
+              placeholder="Mindestens 8 Zeichen"
               className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition"
             />
-            <div className="mt-2 text-right">
-              <Link href="/admin/passwort-reset" className="text-xs text-stone-400 hover:text-[#66735f] transition">
-                Passwort vergessen?
-              </Link>
-            </div>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">
+              Passwort wiederholen
+            </label>
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+              className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition"
+            />
           </div>
 
           {error && (
@@ -80,7 +98,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-full bg-[#1f1c19] py-3.5 text-sm font-semibold text-white transition hover:bg-[#66735f] disabled:opacity-60"
           >
-            {loading ? "Anmelden…" : "Anmelden"}
+            {loading ? "Speichern…" : "Passwort speichern"}
           </button>
         </form>
       </div>
