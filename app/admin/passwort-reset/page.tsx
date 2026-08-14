@@ -16,7 +16,7 @@ export default function PasswortResetPage() {
     setLoading(true);
     setError("");
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${location.origin}/admin/passwort-aendern`,
+      redirectTo: `${location.origin}/auth/callback?next=/admin/passwort-aendern`,
     });
     if (error) {
       setError("Fehler beim Senden der E-Mail.");
