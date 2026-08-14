@@ -49,7 +49,7 @@ export default function AdminBuchungen({ bookings, setBookings, activeApt }: Pro
   }
 
   function bookingForDay(dateStr: string) {
-    return bookings.find((b) => b.apartment_slug === activeApt && b.check_in <= dateStr && b.check_out > dateStr);
+    return bookings.find((b) => b.apartment_slug === activeApt && b.check_in <= dateStr && b.check_out >= dateStr);
   }
 
   async function handleDayClick(dateStr: string) {

@@ -85,7 +85,7 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
 
   function isBooked(date: Date): boolean {
     const iso = toISO(date);
-    return bookings.some((b) => b.check_in <= iso && b.check_out > iso);
+    return bookings.some((b) => b.check_in <= iso && b.check_out >= iso);
   }
 
   function getDaysInMonth(y: number, m: number) {

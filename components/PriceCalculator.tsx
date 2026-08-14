@@ -106,7 +106,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
   }, [slug]);
 
   function rangeOverlapsBooking(from: string, to: string): Booking | null {
-    return bookings.find((b) => b.check_in < to && b.check_out > from) ?? null;
+    return bookings.find((b) => b.check_in <= to && b.check_out >= from) ?? null;
   }
   const [adults, setAdults] = useState(2);
   const [childAges, setChildAges] = useState<number[]>([]); // one entry per child
