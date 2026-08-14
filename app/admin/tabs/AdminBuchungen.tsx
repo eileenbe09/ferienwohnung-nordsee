@@ -208,6 +208,9 @@ export default function AdminBuchungen({ bookings, setBookings, activeApt }: Pro
                           </span>
                         )}
                       </p>
+                      {b.extras_notes && (
+                        <p className="text-xs text-stone-400 italic">{b.extras_notes}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
