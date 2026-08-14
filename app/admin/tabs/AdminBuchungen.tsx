@@ -190,35 +190,41 @@ export default function AdminBuchungen({ bookings, setBookings, activeApt }: Pro
               .map((b) => (
               <div key={b.id} className="rounded-2xl border border-stone-100 bg-[#f7f3ec] overflow-hidden">
                 {/* Kopfzeile */}
-                <div className="flex items-center justify-between px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <div>
+                <div className="flex items-start justify-between px-4 py-4 gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline gap-2">
                       <p className="text-sm font-semibold text-[#1f1c19]">
                         {fmtDate(b.check_in)} – {fmtDate(b.check_out)}
-                        <span className="ml-2 text-xs font-normal text-stone-400">{nights(b)} Nacht{nights(b) !== 1 ? "e" : ""}</span>
                       </p>
-                      <p className="text-xs font-medium text-[#66735f]">
-                        {b.apartment_slug === "seerobbe" ? "Ferienwohnung Seerobbe" : "Ferienwohnung Leuchtturm"}
-                      </p>
-                      <p className="text-xs text-stone-500">
-                        {b.guest_name || <span className="italic text-stone-400">Kein Name hinterlegt</span>}
-                        {(b.extras_bedding || b.extras_towels) && (
-                          <span className="ml-2 text-[#66735f]">
-                            {[b.extras_bedding && "Bettwäsche", b.extras_towels && "Handtücher"].filter(Boolean).join(", ")}
-                          </span>
-                        )}
-                      </p>
-                      {b.extras_notes && (
-                        <p className="text-xs text-stone-400 italic">{b.extras_notes}</p>
+                      <span className="text-xs text-stone-400">{nights(b)} Nacht{nights(b) !== 1 ? "e" : ""}</span>
+                      <span className="text-xs font-medium text-[#66735f]">
+                        {b.apartment_slug === "seerobbe" ? "Seerobbe" : "Leuchtturm"}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 grid grid-cols-1 gap-0.5 sm:grid-cols-2 text-xs text-stone-500">
+                      {b.guest_name && <p>👤 {b.guest_name}</p>}
+                      {b.guest_phone && <p>📞 {b.guest_phone}</p>}
+                      {b.guest_email && <p>✉️ {b.guest_email}</p>}
+                      {b.guest_address && <p>📍 {b.guest_address}</p>}
+                      {(b.extras_bedding || b.extras_towels) && (
+                        <p className="text-[#66735f] sm:col-span-2">
+                          + {[b.extras_bedding && "Bettwäsche", b.extras_towels && "Handtücher"].filter(Boolean).join(", ")}
+                        </p>
+                      )}
+                      {b.extras_notes && <p className="italic text-stone-400 sm:col-span-2">💬 {b.extras_notes}</p>}
+                      {!b.guest_name && !b.guest_phone && !b.guest_email && !b.guest_address && (
+                        <p className="italic text-stone-300">Keine Gästdaten hinterlegt</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+
+                  <div className="flex shrink-0 items-center gap-2">
                     <button
                       onClick={() => expandedId === b.id ? setExpandedId(null) : openEdit(b)}
                       className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600 transition hover:border-[#66735f] hover:text-[#66735f]"
                     >
-                      {expandedId === b.id ? "Schließen" : "Details"}
+                      {expandedId === b.id ? "Schließen" : "Bearbeiten"}
                     </button>
                     <button
                       onClick={async () => { if (!confirm("Löschen?")) return; await supabase.from("bookings").delete().eq("id", b.id); setBookings(prev => prev.filter(x => x.id !== b.id)); if (expandedId === b.id) setExpandedId(null); }}
