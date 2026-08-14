@@ -197,6 +197,9 @@ export default function AdminBuchungen({ bookings, setBookings, activeApt }: Pro
                         {fmtDate(b.check_in)} – {fmtDate(b.check_out)}
                         <span className="ml-2 text-xs font-normal text-stone-400">{nights(b)} Nacht{nights(b) !== 1 ? "e" : ""}</span>
                       </p>
+                      <p className="text-xs font-medium text-[#66735f]">
+                        {b.apartment_slug === "seerobbe" ? "Ferienwohnung Seerobbe" : "Ferienwohnung Leuchtturm"}
+                      </p>
                       <p className="text-xs text-stone-500">
                         {b.guest_name || <span className="italic text-stone-400">Kein Name hinterlegt</span>}
                         {(b.extras_bedding || b.extras_towels) && (
