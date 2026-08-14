@@ -55,6 +55,12 @@ export default function AdminBuchungen({ bookings, setBookings, activeApt }: Pro
     } else {
       const checkIn = selecting < dateStr ? selecting : dateStr;
       const checkOut = selecting < dateStr ? dateStr : selecting;
+      if (checkIn === checkOut) {
+        setMsg("An- und Abreisetag dürfen nicht gleich sein.");
+        setSelecting(null);
+        setTimeout(() => setMsg(""), 3000);
+        return;
+      }
       setLoading(true);
       const { data, error } = await supabase
         .from("bookings")
