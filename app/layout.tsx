@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description:
     "Zwei liebevoll eingerichtete Ferienwohnungen in Altfunnixsiel an der Nordsee – familienfreundlich, ruhig gelegen, ca. 5 km vom Strand.",
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>",
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏖️</text></svg>",
   },
 };
 
