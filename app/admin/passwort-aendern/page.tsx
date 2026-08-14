@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
@@ -11,19 +11,6 @@ export default function PasswortAendernPage() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    // Auf Auth-State warten — funktioniert sowohl für Recovery-Links als auch normalen Login
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        setReady(true);
-      } else if (event === "INITIAL_SESSION" && !session) {
-        router.replace("/admin/login");
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,20 +31,16 @@ export default function PasswortAendernPage() {
     });
 
     if (updateError) {
-      setError("Fehler: " + updateError.message);
+      if (updateError.message.includes("session")) {
+        setError("Die Sitzung ist abgelaufen. Bitte fordere einen neuen Reset-Link an.");
+      } else {
+        setError("Fehler: " + updateError.message);
+      }
       setLoading(false);
     } else {
       router.replace("/admin");
       router.refresh();
     }
-  }
-
-  if (!ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1f1c19]">
-        <p className="text-stone-400 text-sm">Laden…</p>
-      </div>
-    );
   }
 
   return (
