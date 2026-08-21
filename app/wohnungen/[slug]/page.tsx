@@ -247,13 +247,15 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
 
               {/* Karte */}
               <div className="overflow-hidden rounded-3xl shadow-sm">
+                <p className="bg-[#f7f3ec] px-4 pt-4 pb-2 text-xs font-semibold uppercase tracking-wider text-stone-400">Lage</p>
                 <iframe
-                  src="https://www.google.com/maps?q=Altfunnixsiel,+Niedersachsen&output=embed"
+                  src="https://www.google.com/maps?q=Smittsh%C3%B6rn+16,+26409+Wittmund&output=embed"
                   width="100%"
-                  height="220"
+                  height="260"
                   style={{ border: 0, display: "block" }}
                   loading="lazy"
-                  title="Karte"
+                  title="Lage der Ferienwohnung"
+                  allowFullScreen
                 />
               </div>
             </aside>
