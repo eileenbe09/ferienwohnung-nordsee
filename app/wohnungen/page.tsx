@@ -111,14 +111,19 @@ export default async function WohnungenPage() {
                       style={{ backgroundImage: `url('${img}')` }}
                     />
                     {renovating && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <div className="text-center px-6">
-                          <span className="inline-block rounded-full bg-red-500 px-5 py-2 text-sm font-bold text-white shadow-lg">
-                            🔧 Wir modernisieren für Sie
-                          </span>
-                          {availFrom && (
-                            <p className="mt-2 text-xs font-medium text-white/90">Wieder verfügbar ab {availFrom}</p>
-                          )}
+                      <div className="absolute inset-0 overflow-hidden">
+                        <div className="absolute inset-0 bg-black/40" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-[160%] -rotate-[32deg] bg-red-600 py-5 text-center shadow-2xl">
+                            <p className="text-lg font-bold uppercase tracking-widest text-white drop-shadow-lg sm:text-2xl">
+                              🔧 Wir modernisieren für Sie
+                            </p>
+                            {availFrom && (
+                              <p className="mt-1 text-sm font-medium text-red-100">
+                                Wieder verfügbar ab {availFrom}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}

@@ -23,7 +23,7 @@ const STATIC_COVER: Record<string, string> = {
 export default async function Home() {
   const { data: dbApartments } = await supabase
     .from("apartments")
-    .select("id, name, slug, short_description, guests, size")
+    .select("id, name, slug, short_description, guests, size, is_renovating, available_from")
     .order("id", { ascending: true });
 
   const { data: dbImages } = await supabase
@@ -39,6 +39,8 @@ export default async function Home() {
             dbImages?.find((img) => img.apartment_id === apt.id)?.image_url ??
             STATIC_COVER[apt.slug] ??
             "/images/hero1.avif",
+          is_renovating: apt.is_renovating ?? false,
+          available_from: apt.available_from ?? null,
         }))
       : [
           { id: 1, name: "Ferienwohnung Seerobbe", slug: "seerobbe", short_description: "Ruhige, kinderfreundliche Ferienwohnung mit Terrasse und Spielwiese.", guests: "Bis zu 5 Personen", size: 60, coverImage: "/images/fewo1.1.avif" },
@@ -149,32 +151,66 @@ export default async function Home() {
             {typedApartments.length > 0
               ? typedApartments.map((apt) => {
                   const img = apt.coverImage || "/images/hero1.avif";
-                  return (
-                    <Link
-                      key={apt.id}
-                      href={`/wohnungen/${apt.slug}`}
-                      className="group overflow-hidden rounded-[2.5rem] bg-white shadow-xl transition duration-500 hover:-translate-y-2 hover:shadow-2xl"
-                    >
+                  const renovating = apt.is_renovating;
+                  const availFrom = apt.available_from
+                    ? new Date(apt.available_from).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })
+                    : null;
+                  const CardInner = (
+                    <>
                       <div className="relative h-72 overflow-hidden sm:h-80">
                         <div
-                          className="absolute inset-0 bg-cover bg-center transition duration-700 group-hover:scale-110"
+                          className={`absolute inset-0 bg-cover bg-center transition duration-700 ${renovating ? "grayscale-[50%]" : "group-hover:scale-110"}`}
                           style={{ backgroundImage: `url('${img}')` }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                        <div className="absolute bottom-4 left-5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                          {apt.guests}
-                        </div>
+                        {!renovating && (
+                          <div className="absolute bottom-4 left-5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                            {apt.guests}
+                          </div>
+                        )}
+                        {renovating && (
+                          <div className="absolute inset-0 overflow-hidden">
+                            <div className="absolute inset-0 bg-black/40" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-[160%] -rotate-[32deg] bg-red-600 py-5 text-center shadow-2xl">
+                                <p className="text-lg font-bold uppercase tracking-widest text-white drop-shadow-lg sm:text-xl">
+                                  🔧 Wir modernisieren für Sie
+                                </p>
+                                {availFrom && (
+                                  <p className="mt-1 text-xs font-medium text-red-100 sm:text-sm">
+                                    Wieder verfügbar ab {availFrom}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="p-7">
                         <h3 className="font-serif text-2xl text-[#1f1c19]">{apt.name}</h3>
                         <p className="mt-3 leading-7 text-stone-500">{apt.short_description}</p>
                         <div className="mt-5 flex items-center justify-between">
                           <span className="text-sm text-stone-400">{apt.size} m²</span>
-                          <span className="rounded-full bg-[#f7f3ec] px-4 py-2 text-sm font-semibold text-[#66735f] transition group-hover:bg-[#66735f] group-hover:text-white">
-                            Mehr erfahren →
-                          </span>
+                          {renovating ? (
+                            <span className="rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-500">
+                              Vorübergehend geschlossen
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-[#f7f3ec] px-4 py-2 text-sm font-semibold text-[#66735f] transition group-hover:bg-[#66735f] group-hover:text-white">
+                              Mehr erfahren →
+                            </span>
+                          )}
                         </div>
                       </div>
+                    </>
+                  );
+                  return renovating ? (
+                    <div key={apt.id} className="group overflow-hidden rounded-[2.5rem] bg-white shadow-xl cursor-default">
+                      {CardInner}
+                    </div>
+                  ) : (
+                    <Link key={apt.id} href={`/wohnungen/${apt.slug}`} className="group overflow-hidden rounded-[2.5rem] bg-white shadow-xl transition duration-500 hover:-translate-y-2 hover:shadow-2xl">
+                      {CardInner}
                     </Link>
                   );
                 })
