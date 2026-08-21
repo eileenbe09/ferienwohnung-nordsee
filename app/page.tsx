@@ -139,7 +139,7 @@ export default async function Home() {
               Unsere Ferienwohnungen
             </p>
             <h2 className="mt-3 font-serif text-4xl italic text-[#1f1c19] sm:text-5xl">
-              Zwei Rückzugsorte
+              {typedApartments.length === 2 ? "Zwei Rückzugsorte" : `${typedApartments.length} Ferienwohnungen`}
             </h2>
             <p className="mx-auto mt-4 max-w-xl leading-7 text-stone-500">
               Jede Wohnung bietet alles, was du für einen entspannten Familienurlaub
