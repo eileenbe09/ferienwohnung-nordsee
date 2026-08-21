@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 
 type Props = {
   wohnung?: string;
@@ -21,6 +21,7 @@ const WOHNUNG_MAP: Record<string, string> = {
 
 export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kinder, kinderalter, bettwaesche, handtuch, preis }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   const wohnungLabel = wohnung ? (WOHNUNG_MAP[wohnung.toLowerCase()] ?? wohnung) : "";
 
@@ -69,10 +70,26 @@ export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kin
       )}
 
       <form
-        action="https://formspree.io/f/placeholder"
-        method="POST"
         ref={formRef}
         className="mt-6 space-y-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const form = formRef.current!;
+          const data = Object.fromEntries(new FormData(form).entries());
+          setStatus("sending");
+          try {
+            const res = await fetch("/api/anfrage", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+            const json = await res.json();
+            setStatus(json.ok ? "success" : "error");
+            if (json.ok) form.reset();
+          } catch {
+            setStatus("error");
+          }
+        }}
       >
         {/* Versteckte Felder mit Buchungsdetails */}
         {wohnung && <input type="hidden" name="wohnung_slug" value={wohnung} />}
@@ -147,9 +164,23 @@ export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kin
             className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition resize-none" />
         </div>
 
-        <button type="submit"
-          className="w-full rounded-full bg-[#1f1c19] py-3.5 text-sm font-semibold text-white transition hover:bg-[#66735f]">
-          Anfrage absenden →
+        {status === "success" && (
+          <div className="rounded-2xl bg-[#66735f]/10 border border-[#66735f]/20 px-5 py-4 text-sm font-medium text-[#66735f]">
+            ✓ Deine Anfrage wurde erfolgreich gesendet! Wir melden uns bald bei dir.
+          </div>
+        )}
+        {status === "error" && (
+          <div className="rounded-2xl bg-red-50 border border-red-100 px-5 py-4 text-sm font-medium text-red-600">
+            Es gab leider einen Fehler. Bitte schreib uns direkt an info@altfunnixsiel-ferien.de
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={status === "sending" || status === "success"}
+          className="w-full rounded-full bg-[#1f1c19] py-3.5 text-sm font-semibold text-white transition hover:bg-[#66735f] disabled:opacity-50"
+        >
+          {status === "sending" ? "Wird gesendet…" : "Anfrage absenden →"}
         </button>
         <p className="text-center text-xs text-stone-400">Wir melden uns innerhalb von 24 Stunden.</p>
       </form>
