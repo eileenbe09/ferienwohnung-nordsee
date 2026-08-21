@@ -9,7 +9,7 @@ type AptImage = { id: string; image_url: string; sort_order: number };
 
 export default function AdminBilder({ slug }: { slug: string }) {
   const supabase = createClient();
-  const staticApt = staticApartments.find((a) => a.slug === slug)!;
+  const staticApt = staticApartments.find((a) => a.slug === slug);
   const uploadRef = useRef<HTMLInputElement>(null);
   const replaceRef = useRef<HTMLInputElement>(null);
   const dragIdRef = useRef<string | null>(null);
@@ -36,10 +36,10 @@ export default function AdminBilder({ slug }: { slug: string }) {
       if (data && data.length > 0) {
         setImages(data as AptImage[]);
       } else {
-        setImages(staticApt.gallery.map((url, i) => ({ id: `static-${i}`, image_url: url, sort_order: i })));
+        setImages((staticApt?.gallery ?? []).map((url, i) => ({ id: `static-${i}`, image_url: url, sort_order: i })));
       }
     } else {
-      setImages(staticApt.gallery.map((url, i) => ({ id: `static-${i}`, image_url: url, sort_order: i })));
+      setImages((staticApt?.gallery ?? []).map((url, i) => ({ id: `static-${i}`, image_url: url, sort_order: i })));
     }
     setLoading(false);
   }
@@ -47,7 +47,7 @@ export default function AdminBilder({ slug }: { slug: string }) {
   async function handleSeed() {
     if (!aptId) return;
     setSeeding(true);
-    const rows = staticApt.gallery.map((url, i) => ({ apartment_id: aptId, image_url: url, sort_order: i }));
+    const rows = (staticApt?.gallery ?? []).map((url, i) => ({ apartment_id: aptId, image_url: url, sort_order: i }));
     const { data, error } = await supabase.from("apartment_images").insert(rows).select();
     if (!error && data) {
       setImages(data as AptImage[]);

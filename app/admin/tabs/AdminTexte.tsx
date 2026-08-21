@@ -19,18 +19,18 @@ type AptData = {
 
 export default function AdminTexte({ slug }: { slug: string }) {
   const supabase = createClient();
-  const staticApt = staticApartments.find((a) => a.slug === slug)!;
+  const staticApt = staticApartments.find((a) => a.slug === slug);
 
   const [data, setData] = useState<AptData>({
-    name: staticApt.name,
-    short_description: staticApt.shortDescription,
-    description: staticApt.description,
-    guests: staticApt.guests,
-    size: staticApt.size,
-    pets: staticApt.pets,
-    final_cleaning: staticApt.finalCleaning,
-    location: staticApt.location,
-    spa_tax: staticApt.spaTax,
+    name: staticApt?.name ?? "",
+    short_description: staticApt?.shortDescription ?? "",
+    description: staticApt?.description ?? "",
+    guests: staticApt?.guests ?? "Bis zu 5 Personen",
+    size: staticApt?.size ?? 60,
+    pets: staticApt?.pets ?? "Nicht erlaubt",
+    final_cleaning: staticApt?.finalCleaning ?? "75,00 € einmalig",
+    location: staticApt?.location ?? "Altfunnixsiel, ca. 5 km bis Harlesiel",
+    spa_tax: staticApt?.spaTax ?? "Erwachsene 2,50 € / Nacht",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -45,15 +45,15 @@ export default function AdminTexte({ slug }: { slug: string }) {
         setIsInDB(true);
         setData({
           id: apt.id,
-          name: apt.name ?? staticApt.name,
-          short_description: apt.short_description ?? staticApt.shortDescription,
-          description: apt.description ?? staticApt.description,
-          guests: apt.guests ?? staticApt.guests,
-          size: apt.size ?? staticApt.size,
-          pets: apt.pets ?? staticApt.pets,
-          final_cleaning: apt.final_cleaning ?? staticApt.finalCleaning,
-          location: apt.location ?? staticApt.location,
-          spa_tax: apt.spa_tax ?? staticApt.spaTax,
+          name: apt.name ?? staticApt?.name ?? "",
+          short_description: apt.short_description ?? staticApt?.shortDescription ?? "",
+          description: apt.description ?? staticApt?.description ?? "",
+          guests: apt.guests ?? staticApt?.guests ?? "Bis zu 5 Personen",
+          size: apt.size ?? staticApt?.size ?? 60,
+          pets: apt.pets ?? staticApt?.pets ?? "Nicht erlaubt",
+          final_cleaning: apt.final_cleaning ?? staticApt?.finalCleaning ?? "75,00 € einmalig",
+          location: apt.location ?? staticApt?.location ?? "Altfunnixsiel, ca. 5 km bis Harlesiel",
+          spa_tax: apt.spa_tax ?? staticApt?.spaTax ?? "Erwachsene 2,50 € / Nacht",
         });
       }
       setLoading(false);

@@ -27,7 +27,7 @@ function parsePriceStr(str: string): number {
 
 export default function AdminPreise({ slug }: { slug: string }) {
   const supabase = createClient();
-  const staticApt = staticApartments.find((a) => a.slug === slug)!;
+  const staticApt = staticApartments.find((a) => a.slug === slug);
 
   const [aptId, setAptId] = useState<number | null>(null);
   const [prices, setPrices] = useState<PricePeriod[]>([]);
@@ -49,7 +49,7 @@ export default function AdminPreise({ slug }: { slug: string }) {
     } else {
       // Show static prices read-only
       setPrices(
-        staticApt.prices.map((p, i) => ({
+        (staticApt?.prices ?? []).map((p, i) => ({
           id: `static-${i}`,
           from_date: p.from,
           to_date: p.to,

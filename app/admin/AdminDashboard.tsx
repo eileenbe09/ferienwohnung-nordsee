@@ -59,6 +59,15 @@ export default function AdminDashboard({ bookings: initial }: { bookings: Bookin
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  async function handleDeleteApartment(slug: string, name: string) {
+    if (!confirm(`Wohnung "${name}" wirklich löschen? Alle Buchungen, Bilder, Preise und Ausstattung dieser Wohnung werden ebenfalls gelöscht.`)) return;
+    const { error } = await supabase.from("apartments").delete().eq("slug", slug);
+    if (error) { alert("Fehler beim Löschen: " + error.message); return; }
+    setApartments((prev) => prev.filter((a) => a.slug !== slug));
+    const remaining = apartments.filter((a) => a.slug !== slug);
+    setActiveApt(remaining[0]?.slug ?? "seerobbe");
+  }
+
   async function handleAddApartment() {
     const slug = newSlug.trim().toLowerCase().replace(/\s+/g, "-");
     const name = newName.trim();
@@ -111,17 +120,25 @@ export default function AdminDashboard({ bookings: initial }: { bookings: Bookin
         {/* Wohnung wählen */}
         <div className="flex flex-wrap gap-3">
           {apartments.map((apt) => (
-            <button
-              key={apt.slug}
-              onClick={() => setActiveApt(apt.slug)}
-              className={`rounded-full px-6 py-2.5 text-sm font-semibold transition ${
-                activeApt === apt.slug
-                  ? "bg-[#1f1c19] text-white shadow-md"
-                  : "bg-white text-stone-600 shadow-sm hover:bg-stone-50"
-              }`}
-            >
-              {apt.name}
-            </button>
+            <div key={apt.slug} className="flex items-center gap-1">
+              <button
+                onClick={() => setActiveApt(apt.slug)}
+                className={`rounded-full px-6 py-2.5 text-sm font-semibold transition ${
+                  activeApt === apt.slug
+                    ? "bg-[#1f1c19] text-white shadow-md"
+                    : "bg-white text-stone-600 shadow-sm hover:bg-stone-50"
+                }`}
+              >
+                {apt.name}
+              </button>
+              <button
+                onClick={() => handleDeleteApartment(apt.slug, apt.name)}
+                title="Wohnung löschen"
+                className="rounded-full bg-white px-2.5 py-2.5 text-xs text-red-400 shadow-sm transition hover:bg-red-50 hover:text-red-600"
+              >
+                ✕
+              </button>
+            </div>
           ))}
           <button
             onClick={() => setShowAddForm(true)}

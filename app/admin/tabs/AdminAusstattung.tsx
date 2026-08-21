@@ -8,7 +8,7 @@ type Feature = { id: string; label: string; sort_order: number };
 
 export default function AdminAusstattung({ slug }: { slug: string }) {
   const supabase = createClient();
-  const staticApt = staticApartments.find((a) => a.slug === slug)!;
+  const staticApt = staticApartments.find((a) => a.slug === slug);
 
   const [aptId, setAptId] = useState<number | null>(null);
   const [features, setFeatures] = useState<Feature[]>([]);
@@ -36,10 +36,10 @@ export default function AdminAusstattung({ slug }: { slug: string }) {
       if (data && data.length > 0) {
         setFeatures(data as Feature[]);
       } else {
-        setFeatures(staticApt.features.map((label, i) => ({ id: `static-${i}`, label, sort_order: i })));
+        setFeatures((staticApt?.features ?? []).map((label, i) => ({ id: `static-${i}`, label, sort_order: i })));
       }
     } else {
-      setFeatures(staticApt.features.map((label, i) => ({ id: `static-${i}`, label, sort_order: i })));
+      setFeatures((staticApt?.features ?? []).map((label, i) => ({ id: `static-${i}`, label, sort_order: i })));
     }
     setLoading(false);
   }
@@ -47,7 +47,7 @@ export default function AdminAusstattung({ slug }: { slug: string }) {
   async function handleSeed() {
     if (!aptId) return;
     setSeeding(true);
-    const rows = staticApt.features.map((label, i) => ({ apartment_id: aptId, label, sort_order: i }));
+    const rows = (staticApt?.features ?? []).map((label, i) => ({ apartment_id: aptId, label, sort_order: i }));
     const { data, error } = await supabase.from("apartment_features").insert(rows).select();
     if (!error && data) {
       setFeatures(data as Feature[]);
