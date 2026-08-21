@@ -44,6 +44,7 @@ function daysBetween(a: Date, b: Date) {
 }
 
 const MAX_PERSONS = 5;
+const MAX_ADULTS = 4;
 
 function Counter({
   label,
@@ -117,8 +118,16 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
   const cleaning = parsePriceNum(finalCleaning ?? "75");
   const extraPerNight = totalPersons >= MAX_PERSONS ? 10 : 0;
 
+  // Bei 5 Personen muss mindestens ein Kind ≤ 3 Jahre sein
+  const fivePersonViolation =
+    totalPersons === MAX_PERSONS && childAges.length > 0 && !childAges.some((a) => a <= 3);
+
   function addChild() {
-    if (totalPersons < MAX_PERSONS) setChildAges((prev) => [...prev, 5]);
+    if (totalPersons < MAX_PERSONS) {
+      // 5. Person: Kind muss ≤ 3 sein → Standardalter 0
+      const defaultAge = totalPersons === MAX_PERSONS - 1 ? 0 : 5;
+      setChildAges((prev) => [...prev, defaultAge]);
+    }
   }
   function removeChild() {
     setChildAges((prev) => prev.slice(0, -1));
@@ -227,9 +236,9 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
           <Counter
             label="Erwachsene"
             value={adults}
-            onInc={() => { if (totalPersons < MAX_PERSONS) setAdults((n) => n + 1); }}
+            onInc={() => { if (totalPersons < MAX_PERSONS && adults < MAX_ADULTS) setAdults((n) => n + 1); }}
             onDec={() => { if (adults > 1) setAdults((n) => n - 1); }}
-            disableInc={totalPersons >= MAX_PERSONS}
+            disableInc={totalPersons >= MAX_PERSONS || adults >= MAX_ADULTS}
           />
           <Counter
             label="Kinder"
@@ -244,25 +253,33 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
         {childAges.length > 0 && (
           <div className="mt-3 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Alter der Kinder</p>
-            {childAges.map((age, idx) => (
-              <div key={idx} className="flex items-center gap-3 rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-2.5">
-                <span className="flex-1 text-sm text-stone-600">Kind {idx + 1}</span>
-                <select
-                  value={age}
-                  onChange={(e) => setChildAge(idx, Number(e.target.value))}
-                  className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] transition"
-                >
-                  {CHILD_AGE_OPTIONS.map((a) => (
-                    <option key={a} value={a}>{a} Jahr{a !== 1 ? "e" : ""}</option>
-                  ))}
-                </select>
-              </div>
-            ))}
+            {childAges.map((age, idx) => {
+              // Bei 5 Personen: wenn dieses Kind das einzige ist ODER kein anderes ≤ 3 ist → max 3 Jahre
+              const otherHasToddler = childAges.some((a, i) => i !== idx && a <= 3);
+              const maxAge = totalPersons === MAX_PERSONS && !otherHasToddler ? 3 : 17;
+              return (
+                <div key={idx} className="flex items-center gap-3 rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-2.5">
+                  <span className="flex-1 text-sm text-stone-600">Kind {idx + 1}</span>
+                  <select
+                    value={age}
+                    onChange={(e) => setChildAge(idx, Number(e.target.value))}
+                    className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] transition"
+                  >
+                    {CHILD_AGE_OPTIONS.filter((a) => a <= maxAge).map((a) => (
+                      <option key={a} value={a}>{a} Jahr{a !== 1 ? "e" : ""}</option>
+                    ))}
+                  </select>
+                </div>
+              );
+            })}
           </div>
         )}
 
-        {totalPersons >= MAX_PERSONS && (
+        {totalPersons >= MAX_PERSONS && !fivePersonViolation && (
           <p className="mt-1.5 text-xs text-amber-600 font-medium">Maximale Belegung (5 Personen) erreicht · +10,00 € / Nacht</p>
+        )}
+        {fivePersonViolation && (
+          <p className="mt-1.5 text-xs text-red-600 font-medium">Bei 5 Personen muss mindestens ein Kind unter 3 Jahren sein.</p>
         )}
       </div>
 
@@ -370,7 +387,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
       <button
         type="button"
         onClick={handleAnfrage}
-        disabled={!calc}
+        disabled={!calc || fivePersonViolation}
         className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#1f1c19] py-3.5 text-sm font-semibold text-white transition hover:bg-[#66735f] disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {calc ? `Anfrage stellen – ${formatEUR(calc.total)}` : "Anreise & Abreise wählen"}
