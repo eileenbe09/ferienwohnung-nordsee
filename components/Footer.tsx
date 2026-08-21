@@ -41,7 +41,7 @@ export default function Footer() {
               Kontakt
             </p>
             <ul className="mt-4 space-y-2.5 text-sm text-stone-400">
-              <li>Altfunnixsiel, 26409 Wittmund</li>
+              <li>Smittshörn 16, 26409 Wittmund</li>
               <li>
                 <a
                   href="mailto:info@altfunnixsiel-ferien.de"
