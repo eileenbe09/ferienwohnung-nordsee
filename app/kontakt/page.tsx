@@ -26,7 +26,7 @@ export default function KontaktPage() {
               {
                 icon: "📍",
                 title: "Adresse",
-                lines: ["Altfunnixsiel", "26409 Wittmund", "Niedersachsen"],
+                lines: ["Smittshörn 16", "26409 Wittmund"],
               },
               {
                 icon: "✉️",

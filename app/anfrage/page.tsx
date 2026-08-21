@@ -35,7 +35,7 @@ export default async function AnfragePage({ searchParams }: PageProps) {
                 {
                   icon: "📍",
                   title: "Adresse",
-                  text: "Altfunnixsiel\n26409 Wittmund\nNiedersachsen",
+                  text: "Smittshörn 16\n26409 Wittmund",
                 },
                 {
                   icon: "✉️",
