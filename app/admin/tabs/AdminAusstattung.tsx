@@ -93,7 +93,7 @@ export default function AdminAusstattung({ slug }: { slug: string }) {
           <h2 className="font-serif text-2xl text-[#1f1c19]">Ausstattung</h2>
           <p className="mt-1 text-sm text-stone-400">Klicke auf ein Merkmal um es zu bearbeiten.</p>
         </div>
-        {aptId && !hasDBFeatures && (
+        {aptId && !hasDBFeatures && (staticApt?.features ?? []).length > 0 && (
           <button onClick={handleSeed} disabled={seeding}
             className="shrink-0 rounded-full bg-[#66735f] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50">
             {seeding ? "Übertragen…" : "Jetzt einrichten →"}
@@ -107,7 +107,7 @@ export default function AdminAusstattung({ slug }: { slug: string }) {
         </div>
       )}
 
-      {aptId && !hasDBFeatures && (
+      {aptId && !hasDBFeatures && (staticApt?.features ?? []).length > 0 && (
         <div className="mt-4 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
           Klicke auf „Jetzt einrichten" um die aktuellen Merkmale in Supabase zu übertragen und sie danach bearbeitbar zu machen.
         </div>
@@ -156,7 +156,7 @@ export default function AdminAusstattung({ slug }: { slug: string }) {
         </div>
       )}
 
-      {hasDBFeatures && (
+      {aptId && (
         <div className="mt-5 flex gap-3">
           <input
             type="text"
