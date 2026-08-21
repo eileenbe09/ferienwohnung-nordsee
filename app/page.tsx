@@ -43,8 +43,8 @@ export default async function Home() {
           available_from: apt.available_from ?? null,
         }))
       : [
-          { id: 1, name: "Ferienwohnung Seerobbe", slug: "seerobbe", short_description: "Ruhige, kinderfreundliche Ferienwohnung mit Terrasse und Spielwiese.", guests: "Bis zu 5 Personen", size: 60, coverImage: "/images/fewo1.1.avif" },
-          { id: 2, name: "Ferienwohnung Leuchtturm", slug: "leuchtturm", short_description: "Gemütliche Wohnung mit kleinem Garten und voll ausgestatteter Küche.", guests: "Bis zu 5 Personen", size: 60, coverImage: "/images/fewo2.avif" },
+          { id: 1, name: "Ferienwohnung Seerobbe", slug: "seerobbe", short_description: "Ruhige, kinderfreundliche Ferienwohnung mit Terrasse und Spielwiese.", guests: "Bis zu 5 Personen", size: 60, coverImage: "/images/fewo1.1.avif", is_renovating: false, available_from: null },
+          { id: 2, name: "Ferienwohnung Leuchtturm", slug: "leuchtturm", short_description: "Gemütliche Wohnung mit kleinem Garten und voll ausgestatteter Küche.", guests: "Bis zu 5 Personen", size: 60, coverImage: "/images/fewo2.avif", is_renovating: false, available_from: null },
         ];
 
   return (
