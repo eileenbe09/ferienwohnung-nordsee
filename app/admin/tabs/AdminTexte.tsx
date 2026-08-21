@@ -15,6 +15,8 @@ type AptData = {
   final_cleaning: string;
   location: string;
   spa_tax: string;
+  is_renovating: boolean;
+  available_from: string;
 };
 
 export default function AdminTexte({ slug }: { slug: string }) {
@@ -31,6 +33,8 @@ export default function AdminTexte({ slug }: { slug: string }) {
     final_cleaning: staticApt?.finalCleaning ?? "75,00 € einmalig",
     location: staticApt?.location ?? "Altfunnixsiel, ca. 5 km bis Harlesiel",
     spa_tax: staticApt?.spaTax ?? "Erwachsene 2,50 € / Nacht",
+    is_renovating: false,
+    available_from: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,6 +58,8 @@ export default function AdminTexte({ slug }: { slug: string }) {
           final_cleaning: apt.final_cleaning ?? staticApt?.finalCleaning ?? "75,00 € einmalig",
           location: apt.location ?? staticApt?.location ?? "Altfunnixsiel, ca. 5 km bis Harlesiel",
           spa_tax: apt.spa_tax ?? staticApt?.spaTax ?? "Erwachsene 2,50 € / Nacht",
+          is_renovating: apt.is_renovating ?? false,
+          available_from: apt.available_from ?? "",
         });
       }
       setLoading(false);
@@ -77,6 +83,8 @@ export default function AdminTexte({ slug }: { slug: string }) {
       final_cleaning: data.final_cleaning,
       location: data.location,
       spa_tax: data.spa_tax,
+      is_renovating: data.is_renovating,
+      available_from: data.available_from || null,
     }).eq("slug", slug);
     setSaving(false);
     setMsg(error ? "Fehler beim Speichern." : "✓ Gespeichert!");
@@ -127,6 +135,40 @@ export default function AdminTexte({ slug }: { slug: string }) {
         {field("Endreinigung (z. B. 75,00 € einmalig)", "final_cleaning")}
         {field("Lage / Adresse", "location")}
         {field("Kurtaxe-Hinweis", "spa_tax")}
+
+        {/* Renovierungsmodus */}
+        <div className="col-span-full rounded-xl border border-stone-200 bg-[#f7f3ec] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-stone-500 mb-3">Renovierung / Modernisierung</p>
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <div
+              onClick={() => setData((d) => ({ ...d, is_renovating: !d.is_renovating }))}
+              className={`relative h-6 w-11 rounded-full transition-colors ${data.is_renovating ? "bg-red-500" : "bg-stone-300"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${data.is_renovating ? "translate-x-5" : ""}`} />
+            </div>
+            <span className="text-sm font-medium text-[#1f1c19]">
+              {data.is_renovating ? "Wohnung wird gerade renoviert / modernisiert" : "Wohnung ist verfügbar"}
+            </span>
+          </label>
+          {data.is_renovating && (
+            <div className="mt-3">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">
+                Wieder verfügbar ab (optional)
+              </label>
+              <input
+                type="date"
+                value={data.available_from}
+                onChange={(e) => setData((d) => ({ ...d, available_from: e.target.value }))}
+                className="rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition"
+              />
+            </div>
+          )}
+          {data.is_renovating && (
+            <p className="mt-2 text-xs text-stone-400">
+              Auf der Webseite erscheint ein roter Banner auf der Wohnungskarte. Die Detailseite ist nicht buchbar.
+            </p>
+          )}
+        </div>
       </div>
 
       {msg && (

@@ -65,6 +65,11 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
         }))
       : staticApt?.prices ?? [];
 
+  const isRenovating = apartment?.is_renovating ?? false;
+  const availableFrom = apartment?.available_from
+    ? new Date(apartment.available_from).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })
+    : null;
+
   const name = apartment?.name ?? staticApt?.name ?? "";
   const description = apartment?.description ?? staticApt?.description ?? "";
   const guests = apartment?.guests ?? staticApt?.guests ?? "";
@@ -132,6 +137,17 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {/* ── RENOVIERUNGS-BANNER ─────────────────────────────── */}
+      {isRenovating && (
+        <div className="bg-red-500 px-4 py-4 text-center text-white">
+          <p className="font-semibold">🔧 Wir modernisieren diese Wohnung gerade für Sie.</p>
+          {availableFrom && (
+            <p className="mt-1 text-sm text-red-100">Voraussichtlich wieder verfügbar ab {availableFrom}</p>
+          )}
+          <p className="mt-1 text-sm text-red-100">Anfragen sind momentan leider nicht möglich.</p>
+        </div>
+      )}
 
       {/* ── GALERIE ─────────────────────────────────────────── */}
       <div className="bg-[#1f1c19] px-4 py-8 sm:px-6">

@@ -29,7 +29,7 @@ export default async function WohnungenPage() {
   // Wohnungsdaten aus Supabase laden
   const { data: dbApartments } = await supabase
     .from("apartments")
-    .select("id, name, slug, short_description, guests, size")
+    .select("id, name, slug, short_description, guests, size, is_renovating, available_from")
     .order("id", { ascending: true });
 
   // Erstes Bild je Wohnung laden
@@ -46,8 +46,10 @@ export default async function WohnungenPage() {
             dbImages?.find((img) => img.apartment_id === apt.id)?.image_url ??
             STATIC_FALLBACK.find((f) => f.slug === apt.slug)?.coverImage ??
             "/images/hero1.avif",
+          is_renovating: apt.is_renovating ?? false,
+          available_from: apt.available_from ?? null,
         }))
-      : STATIC_FALLBACK;
+      : STATIC_FALLBACK.map((a) => ({ ...a, is_renovating: false, available_from: null }));
 
   return (
     <>
@@ -95,22 +97,38 @@ export default async function WohnungenPage() {
           {apartments.map((apt, i) => {
             const img = apt.coverImage;
             const isEven = i % 2 === 0;
+            const renovating = apt.is_renovating;
+            const availFrom = apt.available_from
+              ? new Date(apt.available_from).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })
+              : null;
             return (
               <div key={apt.id} className="group overflow-hidden rounded-3xl bg-white shadow-lg transition hover:shadow-xl">
                 <div className={`grid lg:grid-cols-2 ${!isEven ? "lg:[&>*:first-child]:order-2" : ""}`}>
                   {/* Bild */}
                   <div className="relative h-64 overflow-hidden lg:h-auto lg:min-h-[380px]">
                     <div
-                      className="absolute inset-0 bg-cover bg-center transition duration-700 group-hover:scale-105"
+                      className={`absolute inset-0 bg-cover bg-center transition duration-700 ${renovating ? "grayscale-[60%]" : "group-hover:scale-105"}`}
                       style={{ backgroundImage: `url('${img}')` }}
                     />
+                    {renovating && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <div className="text-center px-6">
+                          <span className="inline-block rounded-full bg-red-500 px-5 py-2 text-sm font-bold text-white shadow-lg">
+                            🔧 Wir modernisieren für Sie
+                          </span>
+                          {availFrom && (
+                            <p className="mt-2 text-xs font-medium text-white/90">Wieder verfügbar ab {availFrom}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Infos */}
                   <div className="flex flex-col justify-center gap-6 p-8 sm:p-10 lg:p-12">
                     <div>
-                      <span className="inline-block rounded-full bg-[#66735f]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#66735f]">
-                        Ferienwohnung
+                      <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${renovating ? "bg-red-50 text-red-500" : "bg-[#66735f]/10 text-[#66735f]"}`}>
+                        {renovating ? "Vorübergehend nicht verfügbar" : "Ferienwohnung"}
                       </span>
                       <h2 className="mt-3 font-serif text-3xl text-[#1f1c19] sm:text-4xl">{apt.name}</h2>
                       <p className="mt-3 leading-7 text-stone-500">{apt.short_description}</p>
@@ -131,18 +149,27 @@ export default async function WohnungenPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      <Link
-                        href={`/wohnungen/${apt.slug}`}
-                        className="inline-flex items-center gap-2 rounded-full bg-[#1f1c19] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#66735f]"
-                      >
-                        Details & Galerie →
-                      </Link>
-                      <Link
-                        href="/anfrage"
-                        className="inline-flex items-center rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold text-[#1f1c19] transition hover:border-[#66735f] hover:text-[#66735f]"
-                      >
-                        Anfragen
-                      </Link>
+                      {renovating ? (
+                        <div className="rounded-2xl bg-red-50 border border-red-100 px-5 py-3 text-sm text-red-600">
+                          🔧 Wir modernisieren diese Wohnung gerade.
+                          {availFrom && <span className="block mt-0.5 text-xs text-red-400">Wieder buchbar ab {availFrom}</span>}
+                        </div>
+                      ) : (
+                        <>
+                          <Link
+                            href={`/wohnungen/${apt.slug}`}
+                            className="inline-flex items-center gap-2 rounded-full bg-[#1f1c19] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#66735f]"
+                          >
+                            Details & Galerie →
+                          </Link>
+                          <Link
+                            href="/anfrage"
+                            className="inline-flex items-center rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold text-[#1f1c19] transition hover:border-[#66735f] hover:text-[#66735f]"
+                          >
+                            Anfragen
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
