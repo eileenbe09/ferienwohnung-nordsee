@@ -77,22 +77,19 @@ export default function KontaktPage() {
           {/* IMPRESSUM */}
           <div className="mt-8 rounded-3xl bg-white p-7 shadow-sm sm:p-10">
             <h2 className="font-serif text-2xl text-[#1f1c19]">Impressum</h2>
-            <div className="mt-4 space-y-1 text-sm leading-7 text-stone-500">
-              <p className="font-semibold text-[#1f1c19]">Manuela Lojdl</p>
-              <p>Fritz-Reuterstraße 13</p>
-              <p>46244 Bottrop (Kirchhellen)</p>
-              <p>
-                E-Mail:{" "}
-                <a href="mailto:info@altfunnixsiel-ferien.de" className="hover:text-[#66735f] transition">
-                  info@altfunnixsiel-ferien.de
-                </a>
+            <div className="mt-4 text-sm text-stone-500">
+              <div className="space-y-0.5">
+                <p className="font-semibold text-[#1f1c19]">Manuela Lojdl</p>
+                <p>Smittshörn 16</p>
+                <p>26409 Wittmund</p>
+                <p>E-Mail: <a href="mailto:info@altfunnixsiel-ferien.de" className="hover:text-[#66735f] transition">info@altfunnixsiel-ferien.de</a></p>
+              </div>
+              <p className="mt-4 text-xs text-stone-400">
+                Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Manuela Lojdl, Smittshörn 16, 26409 Wittmund
               </p>
-              <p className="pt-3 text-xs text-stone-400">
-                Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV: Manuela Lojdl, Fritz-Reuterstraße 13, 46244 Bottrop
-              </p>
-              <div className="pt-4 border-t border-stone-100 mt-4">
-                <p className="font-semibold text-[#1f1c19] text-sm">Verantwortlich für Gestaltung, Umsetzung und technische Betreuung</p>
-                <div className="mt-2 space-y-0.5 text-sm text-stone-500">
+              <div className="mt-4 pt-4 border-t border-stone-100">
+                <p className="font-semibold text-[#1f1c19]">Verantwortlich für Gestaltung und Umsetzung</p>
+                <div className="mt-1 space-y-0.5">
                   <p>Eileen Partus</p>
                   <p>Telefon: 015567596190</p>
                   <p>E-Mail: <a href="mailto:partus@tsz-wulfen.de" className="hover:text-[#66735f] transition">partus@tsz-wulfen.de</a></p>

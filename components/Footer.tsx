@@ -69,6 +69,9 @@ export default function Footer() {
             <Link href="/kontakt" className="text-xs text-stone-500 hover:text-stone-300 transition">
               Impressum
             </Link>
+            <Link href="/datenschutz" className="text-xs text-stone-500 hover:text-stone-300 transition">
+              Datenschutz
+            </Link>
             <Link href="/admin/login" className="text-xs text-stone-600 hover:text-stone-400 transition">
               Login
             </Link>
