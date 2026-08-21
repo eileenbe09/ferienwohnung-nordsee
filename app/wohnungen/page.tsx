@@ -62,7 +62,7 @@ export default async function WohnungenPage() {
             <div className="mx-auto w-full max-w-6xl">
               <p className="text-xs uppercase tracking-[0.4em] text-[#d8c7af]">Unsere Ferienwohnungen</p>
               <h1 className="mt-3 font-serif text-4xl italic sm:text-5xl lg:text-6xl">
-                Zwei Rückzugsorte<br />
+                {apartments.length === 2 ? "Zwei Rückzugsorte" : `${apartments.length} Ferienwohnungen`}<br />
                 <span className="not-italic font-semibold">an der Nordsee</span>
               </h1>
             </div>
@@ -74,7 +74,7 @@ export default async function WohnungenPage() {
       <div className="bg-[#1f1c19] text-white">
         <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-white/10 lg:grid-cols-4">
           {[
-            { value: "2", label: "Ferienwohnungen" },
+            { value: `${apartments.length}`, label: "Ferienwohnungen" },
             { value: "60 m²", label: "je Wohnung" },
             { value: "5 km", label: "bis zum Strand" },
             { value: "5+", label: "Gäste je Wohnung" },

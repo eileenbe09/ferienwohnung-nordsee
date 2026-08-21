@@ -112,7 +112,7 @@ export default async function Home() {
       <section className="bg-[#1f1c19] text-white">
         <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-white/10 lg:grid-cols-4">
           {[
-            { value: "2", label: "Ferienwohnungen" },
+            { value: `${typedApartments.length}`, label: "Ferienwohnungen" },
             { value: "60 m²", label: "pro Wohnung" },
             { value: "5 km", label: "bis zum Strand" },
             { value: "5+", label: "Gäste je Wohnung" },
