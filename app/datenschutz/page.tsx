@@ -41,7 +41,7 @@ export default function DatenschutzPage() {
 
               <h3 className="mt-4 font-semibold text-[#1f1c19]">Server-Logfiles</h3>
               <p className="mt-2">
-                Beim Aufruf unserer Website werden automatisch technische Informationen (IP-Adresse, Browser, Uhrzeit) durch den Hosting-Anbieter Vercel Inc. erfasst. Diese Daten werden zur Sicherstellung des Betriebs benötigt und nicht mit anderen Daten zusammengeführt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+                Beim Aufruf unserer Website werden automatisch technische Informationen (IP-Adresse, Browser, Uhrzeit) erfasst. Diese Daten werden zur Sicherstellung des Betriebs benötigt und nicht mit anderen Daten zusammengeführt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
               </p>
             </section>
 
@@ -56,14 +56,7 @@ export default function DatenschutzPage() {
             </section>
 
             <section>
-              <h2 className="font-serif text-xl text-[#1f1c19]">4. Hosting</h2>
-              <p className="mt-3">
-                Diese Website wird gehostet bei Vercel Inc., 340 Pine Street, Suite 1601, San Francisco, CA 94104, USA. Vercel ist unser Auftragsverarbeiter gemäß Art. 28 DSGVO. Dabei können personenbezogene Daten in die USA übertragen werden. Vercel ist nach dem EU-U.S. Data Privacy Framework zertifiziert.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-xl text-[#1f1c19]">5. Ihre Rechte</h2>
+              <h2 className="font-serif text-xl text-[#1f1c19]">4. Ihre Rechte</h2>
               <p className="mt-3">Sie haben jederzeit das Recht auf:</p>
               <ul className="mt-2 list-disc pl-5 space-y-1">
                 <li>Auskunft über Ihre bei uns gespeicherten Daten (Art. 15 DSGVO)</li>
@@ -82,7 +75,7 @@ export default function DatenschutzPage() {
             </section>
 
             <section>
-              <h2 className="font-serif text-xl text-[#1f1c19]">6. Datensicherheit</h2>
+              <h2 className="font-serif text-xl text-[#1f1c19]">5. Datensicherheit</h2>
               <p className="mt-3">
                 Diese Website verwendet HTTPS-Verschlüsselung (TLS), um Ihre Daten bei der Übertragung zu schützen.
               </p>
