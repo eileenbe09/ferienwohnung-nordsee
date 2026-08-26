@@ -119,7 +119,7 @@ export default async function Home() {
             { value: `${typedApartments.length}`, label: "Ferienwohnungen" },
             { value: "60 m²", label: "pro Wohnung" },
             { value: "5 km", label: "bis zum Strand" },
-            { value: "5+", label: "Gäste je Wohnung" },
+            { value: "4+", label: "Gäste je Wohnung" },
           ].map(({ value, label }) => (
             <div key={label} className="px-6 py-8 text-center sm:px-10">
               <p className="font-serif text-3xl font-semibold text-[#d8c7af] sm:text-4xl">
