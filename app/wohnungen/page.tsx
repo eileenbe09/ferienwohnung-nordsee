@@ -81,7 +81,7 @@ export default async function WohnungenPage() {
             { value: `${apartments.length}`, label: "Ferienwohnungen" },
             { value: "60 m²", label: "je Wohnung" },
             { value: "5 km", label: "bis zum Strand" },
-            { value: "5+", label: "Gäste je Wohnung" },
+            { value: "4+", label: "Gäste je Wohnung" },
           ].map(({ value, label }) => (
             <div key={label} className="px-6 py-7 text-center">
               <p className="font-serif text-2xl font-semibold text-[#d8c7af] sm:text-3xl">{value}</p>
