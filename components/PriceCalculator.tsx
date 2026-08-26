@@ -96,6 +96,8 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [priceBedding, setPriceBedding] = useState(9);
+  const [priceTowels, setPriceTowels] = useState(5);
 
   useEffect(() => {
     const supabase = createClient();
@@ -104,10 +106,21 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
       .select("check_in, check_out")
       .eq("apartment_slug", slug)
       .then(({ data }) => { if (data) setBookings(data); });
+    supabase
+      .from("apartments")
+      .select("price_bedding, price_towels")
+      .eq("slug", slug)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setPriceBedding(data.price_bedding ?? 9);
+          setPriceTowels(data.price_towels ?? 5);
+        }
+      });
   }, [slug]);
 
   function rangeOverlapsBooking(from: string, to: string): Booking | null {
-    return bookings.find((b) => b.check_in <= to && b.check_out >= from) ?? null;
+    return bookings.find((b) => b.check_in < to && b.check_out > from) ?? null;
   }
   const [adults, setAdults] = useState(2);
   const [childAges, setChildAges] = useState<number[]>([]); // one entry per child

@@ -36,14 +36,19 @@ export default function AdminPreise({ slug }: { slug: string }) {
   const [toDate, setToDate] = useState("");
   const [priceVal, setPriceVal] = useState("");
   const [msg, setMsg] = useState("");
+  const [priceBedding, setPriceBedding] = useState<number>(9);
+  const [priceTowels, setPriceTowels] = useState<number>(5);
+  const [extraMsg, setExtraMsg] = useState("");
 
   useEffect(() => { load(); }, [slug]);
 
   async function load() {
     setLoading(true);
-    const { data: apt } = await supabase.from("apartments").select("id").eq("slug", slug).single();
+    const { data: apt } = await supabase.from("apartments").select("id, price_bedding, price_towels").eq("slug", slug).single();
     if (apt) {
       setAptId(apt.id);
+      setPriceBedding(apt.price_bedding ?? 9);
+      setPriceTowels(apt.price_towels ?? 5);
       const { data } = await supabase.from("apartment_prices").select("*").eq("apartment_id", apt.id).order("from_date");
       setPrices((data ?? []) as PricePeriod[]);
     } else {
@@ -80,6 +85,13 @@ export default function AdminPreise({ slug }: { slug: string }) {
   }
 
   function flash(text: string) { setMsg(text); setTimeout(() => setMsg(""), 3000); }
+
+  async function handleSaveExtras() {
+    if (!aptId) return;
+    const { error } = await supabase.from("apartments").update({ price_bedding: priceBedding, price_towels: priceTowels }).eq("id", aptId);
+    setExtraMsg(error ? "Fehler beim Speichern." : "✓ Gespeichert!");
+    setTimeout(() => setExtraMsg(""), 3000);
+  }
 
   const isStatic = !aptId;
 
@@ -125,6 +137,29 @@ export default function AdminPreise({ slug }: { slug: string }) {
           </div>
         )}
       </div>
+
+      {!isStatic && (
+        <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="font-serif text-xl text-[#1f1c19]">Extras (Preise pro Person)</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Bettwäsche-Paket (€ / Person)</label>
+              <input type="number" min="0" value={priceBedding} onChange={(e) => setPriceBedding(Number(e.target.value))}
+                className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Handtuch-Paket (€ / Person)</label>
+              <input type="number" min="0" value={priceTowels} onChange={(e) => setPriceTowels(Number(e.target.value))}
+                className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
+            </div>
+          </div>
+          {extraMsg && <p className={`mt-2 text-sm font-medium ${extraMsg.startsWith("✓") ? "text-[#66735f]" : "text-red-500"}`}>{extraMsg}</p>}
+          <button onClick={handleSaveExtras}
+            className="mt-4 rounded-full bg-[#1f1c19] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#66735f]">
+            Extras speichern
+          </button>
+        </div>
+      )}
 
       {!isStatic && (
         <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">

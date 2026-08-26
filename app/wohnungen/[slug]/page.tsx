@@ -74,7 +74,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   const description = apartment?.description ?? staticApt?.description ?? "";
   const guests = apartment?.guests ?? staticApt?.guests ?? "";
   const size = apartment?.size ?? staticApt?.size ?? 60;
-  const pets = apartment?.pets ?? staticApt?.pets ?? "Nicht erlaubt";
+  const pets = apartment?.pets ?? staticApt?.pets ?? "Hunde nicht erlaubt";
   const finalCleaning = apartment?.final_cleaning ?? staticApt?.finalCleaning ?? "75,00 € einmalig";
   const location = apartment?.location ?? staticApt?.location ?? "Altfunnixsiel, ca. 5 km bis Harlesiel";
   const spaTax = apartment?.spa_tax ?? staticApt?.spaTax ?? "Erwachsene 2,50 € / Nacht";
