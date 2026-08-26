@@ -38,17 +38,20 @@ export default function AdminPreise({ slug }: { slug: string }) {
   const [msg, setMsg] = useState("");
   const [priceBedding, setPriceBedding] = useState<number>(9);
   const [priceTowels, setPriceTowels] = useState<number>(5);
+  const [priceFinalCleaning, setPriceFinalCleaning] = useState<number>(75);
   const [extraMsg, setExtraMsg] = useState("");
+  const [copyMsg, setCopyMsg] = useState("");
 
   useEffect(() => { load(); }, [slug]);
 
   async function load() {
     setLoading(true);
-    const { data: apt } = await supabase.from("apartments").select("id, price_bedding, price_towels").eq("slug", slug).single();
+    const { data: apt } = await supabase.from("apartments").select("id, price_bedding, price_towels, price_final_cleaning").eq("slug", slug).single();
     if (apt) {
       setAptId(apt.id);
       setPriceBedding(apt.price_bedding ?? 9);
       setPriceTowels(apt.price_towels ?? 5);
+      setPriceFinalCleaning(apt.price_final_cleaning ?? 75);
       const { data } = await supabase.from("apartment_prices").select("*").eq("apartment_id", apt.id).order("from_date");
       setPrices((data ?? []) as PricePeriod[]);
     } else {
@@ -88,9 +91,36 @@ export default function AdminPreise({ slug }: { slug: string }) {
 
   async function handleSaveExtras() {
     if (!aptId) return;
-    const { error } = await supabase.from("apartments").update({ price_bedding: priceBedding, price_towels: priceTowels }).eq("id", aptId);
+    const { error } = await supabase.from("apartments").update({
+      price_bedding: priceBedding,
+      price_towels: priceTowels,
+      price_final_cleaning: priceFinalCleaning,
+    }).eq("id", aptId);
     setExtraMsg(error ? "Fehler beim Speichern." : "✓ Gespeichert!");
     setTimeout(() => setExtraMsg(""), 3000);
+  }
+
+  async function handleCopyToAll() {
+    if (!aptId || prices.length === 0) return;
+    if (!confirm("Alle Preiszeiträume dieser Wohnung auf alle anderen Wohnungen übertragen? Bestehende Zeiträume der anderen Wohnungen werden dabei ersetzt.")) return;
+
+    const { data: allApts } = await supabase.from("apartments").select("id").neq("id", aptId);
+    if (!allApts || allApts.length === 0) { flash("Keine anderen Wohnungen gefunden."); return; }
+
+    let hasError = false;
+    for (const other of allApts) {
+      await supabase.from("apartment_prices").delete().eq("apartment_id", other.id);
+      const copies = prices.map(({ from_date, to_date, price_per_night }) => ({
+        apartment_id: other.id,
+        from_date,
+        to_date,
+        price_per_night,
+      }));
+      const { error } = await supabase.from("apartment_prices").insert(copies);
+      if (error) hasError = true;
+    }
+    setCopyMsg(hasError ? "Fehler beim Übertragen." : "✓ Zeiträume auf alle Wohnungen übertragen!");
+    setTimeout(() => setCopyMsg(""), 4000);
   }
 
   const isStatic = !aptId;
@@ -138,10 +168,24 @@ export default function AdminPreise({ slug }: { slug: string }) {
         )}
       </div>
 
+      {!isStatic && prices.length > 0 && (
+        <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="font-serif text-xl text-[#1f1c19]">Zeiträume auf andere Wohnungen übertragen</h2>
+          <p className="mt-1 text-sm text-stone-400">
+            Überträgt alle Preiszeiträume dieser Wohnung auf alle anderen Wohnungen. Bestehende Zeiträume dort werden ersetzt.
+          </p>
+          {copyMsg && <p className={`mt-2 text-sm font-medium ${copyMsg.startsWith("✓") ? "text-[#66735f]" : "text-red-500"}`}>{copyMsg}</p>}
+          <button onClick={handleCopyToAll}
+            className="mt-4 rounded-full border-2 border-[#66735f] px-6 py-3 text-sm font-semibold text-[#66735f] transition hover:bg-[#66735f] hover:text-white">
+            🔁 Zeiträume für alle Wohnungen übernehmen
+          </button>
+        </div>
+      )}
+
       {!isStatic && (
         <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
           <h2 className="font-serif text-xl text-[#1f1c19]">Extras (Preise pro Person)</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Bettwäsche-Paket (€ / Person)</label>
               <input type="number" min="0" value={priceBedding} onChange={(e) => setPriceBedding(Number(e.target.value))}
@@ -150,6 +194,11 @@ export default function AdminPreise({ slug }: { slug: string }) {
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Handtuch-Paket (€ / Person)</label>
               <input type="number" min="0" value={priceTowels} onChange={(e) => setPriceTowels(Number(e.target.value))}
+                className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Endreinigung (€ einmalig)</label>
+              <input type="number" min="0" value={priceFinalCleaning} onChange={(e) => setPriceFinalCleaning(Number(e.target.value))}
                 className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
             </div>
           </div>

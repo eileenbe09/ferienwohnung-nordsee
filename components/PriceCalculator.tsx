@@ -100,6 +100,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [priceBedding, setPriceBedding] = useState(9);
   const [priceTowels, setPriceTowels] = useState(5);
+  const [priceFinalCleaning, setPriceFinalCleaning] = useState<number | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -110,13 +111,14 @@ export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults
       .then(({ data }) => { if (data) setBookings(data); });
     supabase
       .from("apartments")
-      .select("price_bedding, price_towels")
+      .select("price_bedding, price_towels, price_final_cleaning")
       .eq("slug", slug)
       .single()
       .then(({ data }) => {
         if (data) {
           setPriceBedding(data.price_bedding ?? 9);
           setPriceTowels(data.price_towels ?? 5);
+          if (data.price_final_cleaning != null) setPriceFinalCleaning(data.price_final_cleaning);
         }
       });
   }, [slug]);
@@ -130,7 +132,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults
   const [wantsHandtuch, setWantsHandtuch] = useState(false);
 
   const totalPersons = adults + childAges.length;
-  const cleaning = parsePriceNum(finalCleaning ?? "75");
+  const cleaning = priceFinalCleaning ?? parsePriceNum(finalCleaning ?? "75");
   const extraPerNight = totalPersons >= MAX_PERSONS ? 10 : 0;
 
   // Bei 5 Personen muss mindestens ein Kind ≤ maxToddlerAge Jahre sein
