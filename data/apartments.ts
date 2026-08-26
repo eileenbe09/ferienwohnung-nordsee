@@ -5,7 +5,7 @@ export const apartments = [
     slug: "seerobbe",
     shortDescription:
       "Ruhige, kinderfreundliche Ferienwohnung in Altfunnixsiel mit Terrasse, Spielwiese und zwei Schlafzimmern.",
-    guests: "2 Erwachsene, 2 Kinder + 1 Kleinkind bis 3 Jahre",
+    guests: "4 Personen + 1 Kind bis 4 Jahre",
     size: 60,
     image: "/images/fewo1.1.avif",
     gallery: [
@@ -61,7 +61,7 @@ export const apartments = [
     slug: "leuchtturm",
     shortDescription:
       "Kinderfreundliche Ferienwohnung in ruhiger Feldrandlage mit kleinem Gartenstück und voll ausgestatteter Küche.",
-    guests: "4 Personen + 1 Kind bis 3 Jahren",
+    guests: "4 Personen + 1 Kind bis 4 Jahre",
     size: 60,
     image: "/images/fewo2.avif",
     gallery: [
