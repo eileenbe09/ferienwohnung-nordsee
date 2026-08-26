@@ -359,13 +359,13 @@ export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults
           <div className="mt-3 space-y-1.5">
             {calc.breakdown.map((b) => (
               <div key={b.label} className="flex justify-between text-sm text-stone-600">
-                <span>{b.nights} Nacht{b.nights !== 1 ? "e" : ""} × {b.label}</span>
+                <span>{b.nights} {b.nights !== 1 ? "Nächte" : "Nacht"} × {b.label}</span>
                 <span>{formatEUR(b.price)}</span>
               </div>
             ))}
             {calc.extraTotal > 0 && (
               <div className="flex justify-between text-sm text-stone-600">
-                <span>{calc.nights} Nacht{calc.nights !== 1 ? "e" : ""} × 10,00 € (5. Person)</span>
+                <span>{calc.nights} {calc.nights !== 1 ? "Nächte" : "Nacht"} × 10,00 € (5. Person)</span>
                 <span>{formatEUR(calc.extraTotal)}</span>
               </div>
             )}
