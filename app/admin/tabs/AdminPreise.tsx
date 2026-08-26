@@ -17,8 +17,17 @@ function isoToDE(iso: string) {
 }
 
 function deToISO(de: string) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(de)) return de;
   const [d, m, y] = de.split(".");
   return `${y}-${m}-${d}`;
+}
+
+function formatDateDE(str: string) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [y, m, d] = str.split("-");
+    return `${d}.${m}.${y}`;
+  }
+  return str;
 }
 
 function parsePriceStr(str: string): number {
@@ -102,7 +111,7 @@ export default function AdminPreise({ slug }: { slug: string }) {
 
   async function handleCopyPeriodToAll(period: PricePeriod) {
     if (!aptId) return;
-    if (!confirm(`Zeitraum ${period.from_date} – ${period.to_date} (${period.price_per_night} €/Nacht) auf alle anderen Wohnungen übertragen?`)) return;
+    if (!confirm(`Zeitraum ${formatDateDE(period.from_date)} – ${formatDateDE(period.to_date)} (${period.price_per_night} €/Nacht) auf alle anderen Wohnungen übertragen?`)) return;
 
     const { data: allApts } = await supabase.from("apartments").select("id").neq("id", aptId);
     if (!allApts || allApts.length === 0) { flash("Keine anderen Wohnungen gefunden."); return; }
@@ -159,7 +168,7 @@ export default function AdminPreise({ slug }: { slug: string }) {
               <div key={p.id} className="flex items-center justify-between rounded-2xl bg-[#f7f3ec] px-5 py-3.5">
                 <div>
                   <p className="text-sm font-semibold text-[#1f1c19]">
-                    {p.from_date} – {p.to_date}
+                    {formatDateDE(p.from_date)} – {formatDateDE(p.to_date)}
                   </p>
                   <p className="text-sm text-stone-500">{p.price_per_night} € / Nacht</p>
                 </div>
