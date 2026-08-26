@@ -100,26 +100,32 @@ export default function AdminPreise({ slug }: { slug: string }) {
     setTimeout(() => setExtraMsg(""), 3000);
   }
 
-  async function handleCopyToAll() {
-    if (!aptId || prices.length === 0) return;
-    if (!confirm("Alle Preiszeiträume dieser Wohnung auf alle anderen Wohnungen übertragen? Bestehende Zeiträume der anderen Wohnungen werden dabei ersetzt.")) return;
+  async function handleCopyPeriodToAll(period: PricePeriod) {
+    if (!aptId) return;
+    if (!confirm(`Zeitraum ${period.from_date} – ${period.to_date} (${period.price_per_night} €/Nacht) auf alle anderen Wohnungen übertragen?`)) return;
 
     const { data: allApts } = await supabase.from("apartments").select("id").neq("id", aptId);
     if (!allApts || allApts.length === 0) { flash("Keine anderen Wohnungen gefunden."); return; }
 
     let hasError = false;
     for (const other of allApts) {
-      await supabase.from("apartment_prices").delete().eq("apartment_id", other.id);
-      const copies = prices.map(({ from_date, to_date, price_per_night }) => ({
+      const { data: existing } = await supabase
+        .from("apartment_prices").select("id, from_date, to_date").eq("apartment_id", other.id);
+      const overlapping = (existing ?? []).filter(
+        (e) => e.from_date === period.from_date && e.to_date === period.to_date
+      );
+      for (const ov of overlapping) {
+        await supabase.from("apartment_prices").delete().eq("id", ov.id);
+      }
+      const { error } = await supabase.from("apartment_prices").insert({
         apartment_id: other.id,
-        from_date,
-        to_date,
-        price_per_night,
-      }));
-      const { error } = await supabase.from("apartment_prices").insert(copies);
+        from_date: period.from_date,
+        to_date: period.to_date,
+        price_per_night: period.price_per_night,
+      });
       if (error) hasError = true;
     }
-    setCopyMsg(hasError ? "Fehler beim Übertragen." : "✓ Zeiträume auf alle Wohnungen übertragen!");
+    setCopyMsg(hasError ? "Fehler beim Übertragen." : "✓ Zeitraum auf alle Wohnungen übertragen!");
     setTimeout(() => setCopyMsg(""), 4000);
   }
 
@@ -147,6 +153,7 @@ export default function AdminPreise({ slug }: { slug: string }) {
         ) : prices.length === 0 ? (
           <p className="mt-4 text-sm text-stone-400">Noch keine Preiszeiträume eingetragen.</p>
         ) : (
+          {copyMsg && <p className={`mt-3 text-sm font-medium ${copyMsg.startsWith("✓") ? "text-[#66735f]" : "text-red-500"}`}>{copyMsg}</p>}
           <div className="mt-4 space-y-2">
             {prices.map((p) => (
               <div key={p.id} className="flex items-center justify-between rounded-2xl bg-[#f7f3ec] px-5 py-3.5">
@@ -157,30 +164,23 @@ export default function AdminPreise({ slug }: { slug: string }) {
                   <p className="text-sm text-stone-500">{p.price_per_night} € / Nacht</p>
                 </div>
                 {!p.id.startsWith("static") && (
-                  <button onClick={() => handleDelete(p.id)}
-                    className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-400 transition hover:bg-red-50 hover:text-red-600">
-                    Löschen
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handleCopyPeriodToAll(p)}
+                      className="rounded-full border border-[#66735f]/40 px-3 py-1 text-xs text-[#66735f] transition hover:bg-[#66735f]/10"
+                      title="Diesen Zeitraum auf alle Wohnungen übertragen">
+                      Für alle
+                    </button>
+                    <button onClick={() => handleDelete(p.id)}
+                      className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-400 transition hover:bg-red-50 hover:text-red-600">
+                      Löschen
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
           </div>
         )}
       </div>
-
-      {!isStatic && prices.length > 0 && (
-        <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="font-serif text-xl text-[#1f1c19]">Zeiträume auf andere Wohnungen übertragen</h2>
-          <p className="mt-1 text-sm text-stone-400">
-            Überträgt alle Preiszeiträume dieser Wohnung auf alle anderen Wohnungen. Bestehende Zeiträume dort werden ersetzt.
-          </p>
-          {copyMsg && <p className={`mt-2 text-sm font-medium ${copyMsg.startsWith("✓") ? "text-[#66735f]" : "text-red-500"}`}>{copyMsg}</p>}
-          <button onClick={handleCopyToAll}
-            className="mt-4 rounded-full border-2 border-[#66735f] px-6 py-3 text-sm font-semibold text-[#66735f] transition hover:bg-[#66735f] hover:text-white">
-            🔁 Zeiträume für alle Wohnungen übernehmen
-          </button>
-        </div>
-      )}
 
       {!isStatic && (
         <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
