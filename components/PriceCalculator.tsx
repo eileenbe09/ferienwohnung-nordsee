@@ -276,7 +276,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
         )}
 
         {totalPersons >= MAX_PERSONS && !fivePersonViolation && (
-          <p className="mt-1.5 text-xs text-amber-600 font-medium">Maximale Belegung (5 Personen) erreicht · +10,00 € / Nacht</p>
+          <p className="mt-1.5 text-xs text-amber-600 font-medium">Ab 5 Personen: +10,00 € Aufschlag pro Nacht (5. Person muss Kind bis 3 Jahre sein)</p>
         )}
         {fivePersonViolation && (
           <p className="mt-1.5 text-xs text-red-600 font-medium">Bei 5 Personen muss mindestens ein Kind unter 3 Jahren sein.</p>
