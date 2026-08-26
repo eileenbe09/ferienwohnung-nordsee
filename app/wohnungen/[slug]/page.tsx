@@ -38,7 +38,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
     .from("apartment_prices")
     .select("*")
     .eq("apartment_id", apartment?.id ?? 0)
-    .order("start_date", { ascending: true });
+    .order("from_date", { ascending: true });
 
   const galleryImages =
     dbImages && dbImages.length > 0
