@@ -201,7 +201,13 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                 <div>
                   <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Preis berechnen</p>
                   <div className="mt-4">
-                    <PriceCalculator slug={slug} prices={calendarPrices} finalCleaning={finalCleaning} />
+                    <PriceCalculator
+                      slug={slug}
+                      prices={calendarPrices}
+                      finalCleaning={finalCleaning}
+                      maxAdults={slug === "leuchtturm" ? 3 : 4}
+                      maxToddlerAge={slug === "leuchtturm" ? 4 : 3}
+                    />
                   </div>
                 </div>
               )}

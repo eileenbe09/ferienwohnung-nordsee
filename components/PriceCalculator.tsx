@@ -14,6 +14,8 @@ type Props = {
   slug: string;
   prices: PricePeriod[];
   finalCleaning?: string;
+  maxAdults?: number;
+  maxToddlerAge?: number;
 };
 
 function parseDE(str: string): Date {
@@ -44,7 +46,6 @@ function daysBetween(a: Date, b: Date) {
 }
 
 const MAX_PERSONS = 5;
-const MAX_ADULTS = 4;
 
 function Counter({
   label,
@@ -89,7 +90,7 @@ const CHILD_AGE_OPTIONS = Array.from({ length: 18 }, (_, i) => i); // 0–17
 
 type Booking = { check_in: string; check_out: string };
 
-export default function PriceCalculator({ slug, prices, finalCleaning }: Props) {
+export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults = 4, maxToddlerAge = 3 }: Props) {
   const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
 
@@ -131,9 +132,9 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
   const cleaning = parsePriceNum(finalCleaning ?? "75");
   const extraPerNight = totalPersons >= MAX_PERSONS ? 10 : 0;
 
-  // Bei 5 Personen muss mindestens ein Kind ≤ 3 Jahre sein
+  // Bei 5 Personen muss mindestens ein Kind ≤ maxToddlerAge Jahre sein
   const fivePersonViolation =
-    totalPersons === MAX_PERSONS && childAges.length > 0 && !childAges.some((a) => a <= 3);
+    totalPersons === MAX_PERSONS && childAges.length > 0 && !childAges.some((a) => a <= maxToddlerAge);
 
   function addChild() {
     if (totalPersons < MAX_PERSONS) {
@@ -179,8 +180,8 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
     });
 
     const extraTotal = extraPerNight * nights;
-    const bettwaescheTotal = wantsBettwaesche ? 9 * totalPersons : 0;
-    const handtuchTotal = wantsHandtuch ? 5 * totalPersons : 0;
+    const bettwaescheTotal = wantsBettwaesche ? priceBedding * totalPersons : 0;
+    const handtuchTotal = wantsHandtuch ? priceTowels * totalPersons : 0;
     const total = baseTotal + extraTotal + cleaning + bettwaescheTotal + handtuchTotal;
 
     return { nights, breakdown, baseTotal, extraTotal, bettwaescheTotal, handtuchTotal, total };
@@ -249,9 +250,9 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
           <Counter
             label="Erwachsene"
             value={adults}
-            onInc={() => { if (totalPersons < MAX_PERSONS && adults < MAX_ADULTS) setAdults((n) => n + 1); }}
+            onInc={() => { if (totalPersons < MAX_PERSONS && adults < maxAdults) setAdults((n) => n + 1); }}
             onDec={() => { if (adults > 1) setAdults((n) => n - 1); }}
-            disableInc={totalPersons >= MAX_PERSONS || adults >= MAX_ADULTS}
+            disableInc={totalPersons >= MAX_PERSONS || adults >= maxAdults}
           />
           <Counter
             label="Kinder"
@@ -268,8 +269,8 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
             <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Alter der Kinder</p>
             {childAges.map((age, idx) => {
               // Bei 5 Personen: wenn dieses Kind das einzige ist ODER kein anderes ≤ 3 ist → max 3 Jahre
-              const otherHasToddler = childAges.some((a, i) => i !== idx && a <= 3);
-              const maxAge = totalPersons === MAX_PERSONS && !otherHasToddler ? 3 : 17;
+              const otherHasToddler = childAges.some((a, i) => i !== idx && a <= maxToddlerAge);
+              const maxAge = totalPersons === MAX_PERSONS && !otherHasToddler ? maxToddlerAge : 17;
               return (
                 <div key={idx} className="flex items-center gap-3 rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-2.5">
                   <span className="flex-1 text-sm text-stone-600">Kind {idx + 1}</span>
@@ -289,10 +290,10 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
         )}
 
         {totalPersons >= MAX_PERSONS && !fivePersonViolation && (
-          <p className="mt-1.5 text-xs text-amber-600 font-medium">Ab 5 Personen: +10,00 € Aufschlag pro Nacht (5. Person muss Kind bis 3 Jahre sein)</p>
+          <p className="mt-1.5 text-xs text-amber-600 font-medium">Ab 5 Personen: +10,00 € Aufschlag pro Nacht (5. Person muss Kind bis {maxToddlerAge} Jahre sein)</p>
         )}
         {fivePersonViolation && (
-          <p className="mt-1.5 text-xs text-red-600 font-medium">Bei 5 Personen muss mindestens ein Kind unter 3 Jahren sein.</p>
+          <p className="mt-1.5 text-xs text-red-600 font-medium">Bei 5 Personen muss mindestens ein Kind bis {maxToddlerAge} Jahre sein.</p>
         )}
       </div>
 
@@ -314,7 +315,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
             {wantsBettwaesche ? "✓" : ""}
           </span>
           <span className="flex-1">Bettwäsche-Paket</span>
-          <span className="font-semibold text-[#1f1c19]">9,00 € / Person</span>
+          <span className="font-semibold text-[#1f1c19]">{priceBedding.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € / Person</span>
         </button>
         <button
           type="button"
@@ -331,7 +332,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
             {wantsHandtuch ? "✓" : ""}
           </span>
           <span className="flex-1">Handtuch-Paket</span>
-          <span className="font-semibold text-[#1f1c19]">5,00 € / Person</span>
+          <span className="font-semibold text-[#1f1c19]">{priceTowels.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € / Person</span>
         </button>
       </div>
 
@@ -358,13 +359,13 @@ export default function PriceCalculator({ slug, prices, finalCleaning }: Props) 
             </div>
             {calc.bettwaescheTotal > 0 && (
               <div className="flex justify-between text-sm text-stone-600">
-                <span>Bettwäsche ({totalPersons} × 9,00 €)</span>
+                <span>Bettwäsche ({totalPersons} × {formatEUR(priceBedding)})</span>
                 <span>{formatEUR(calc.bettwaescheTotal)}</span>
               </div>
             )}
             {calc.handtuchTotal > 0 && (
               <div className="flex justify-between text-sm text-stone-600">
-                <span>Handtücher ({totalPersons} × 5,00 €)</span>
+                <span>Handtücher ({totalPersons} × {formatEUR(priceTowels)})</span>
                 <span>{formatEUR(calc.handtuchTotal)}</span>
               </div>
             )}
