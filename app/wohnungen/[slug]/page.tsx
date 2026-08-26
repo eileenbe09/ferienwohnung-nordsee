@@ -78,7 +78,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   const finalCleaning = apartment?.final_cleaning ?? staticApt?.finalCleaning ?? "75,00 € einmalig";
   const location = apartment?.location ?? staticApt?.location ?? "Altfunnixsiel, ca. 5 km bis Harlesiel";
   const spaTax = apartment?.spa_tax ?? staticApt?.spaTax ?? "Erwachsene 2,50 € / Nacht";
-  const optionalAddons = apartment?.optional_addons ?? "Bettwäsche-Set, Handtücher auf Anfrage";
+  const optionalAddons = apartment?.optional_addons ?? "Fahrräder auf Anfrage";
 
   const highlights = [
     { icon: "🏠", label: `${size} m²` },
