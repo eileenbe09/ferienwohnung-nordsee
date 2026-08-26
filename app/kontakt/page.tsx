@@ -65,7 +65,7 @@ export default function KontaktPage() {
           {/* KARTE */}
           <div className="mt-8 overflow-hidden rounded-3xl shadow-lg">
             <iframe
-              src="https://www.google.com/maps?q=Altfunnixsiel,+Niedersachsen&output=embed"
+              src="https://www.google.com/maps?q=Smittsh%C3%B6rn+16,+26409+Wittmund&output=embed"
               width="100%"
               height="360"
               style={{ border: 0, display: "block" }}
