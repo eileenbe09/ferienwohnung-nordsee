@@ -144,7 +144,7 @@ export default async function WohnungenPage() {
                         { label: "Größe", value: `${apt.size} m²` },
                         { label: "Gäste", value: apt.guests ?? "–" },
                         { label: "Strand", value: "ca. 5 km" },
-                        { label: "Haustiere", value: "Hunde nicht erlaubt" },
+                        { label: "Haustiere", value: "Haustiere nicht erlaubt" },
                       ].map(({ label, value }) => (
                         <div key={label} className="rounded-2xl bg-[#f7f3ec] px-4 py-3">
                           <p className="text-xs text-stone-400">{label}</p>

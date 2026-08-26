@@ -26,7 +26,7 @@ export const apartments = [
       "/images/fewo1.15.avif",
     ],
     location: "Altfunnixsiel, ca. 5 km bis Harlesiel / Carolinensiel",
-    pets: "Hunde nicht erlaubt",
+    pets: "Haustiere nicht erlaubt",
     finalCleaning: "75,00 € einmalig",
     spaTax:
       "Erwachsene 2,50 € pro Übernachtung, Kinder 4–15 Jahre 1,25 €, Kinder bis 3 Jahre frei",
@@ -82,7 +82,7 @@ export const apartments = [
       "/images/fewo2.15.avif",
     ],
     location: "Altfunnixsiel, nahe Carolinensiel, ca. 5 km bis zum Strand",
-    pets: "Hunde nicht erlaubt",
+    pets: "Haustiere nicht erlaubt",
     finalCleaning: "75,00 € einmalig",
     spaTax:
       "Erwachsene 2,50 € pro Übernachtung, Kinder 4–15 Jahre 1,25 €, Kinder bis 3 Jahre frei",
