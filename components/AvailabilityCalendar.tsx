@@ -41,6 +41,10 @@ const SEASON_COLORS = [
   "bg-[#f5c0a0] text-[#7a2800]",
 ];
 
+const SEASON_BG_HEX = ["#c8ddc0", "#f5e0b0", "#f5c0a0"];
+const FREE_BG_HEX = "#f7f3ec";
+const BOOKED_BG_HEX = "#ef4444";
+
 export default function AvailabilityCalendar({ prices, slug }: Props) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -88,8 +92,17 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
 
   function isBooked(date: Date): boolean {
     const iso = toISO(date);
-    // Strikter Vergleich: Abreisetag = Anreisetag des nächsten Gastes erlaubt
-    return bookings.some((b) => b.check_in <= iso && b.check_out > iso);
+    return bookings.some((b) => b.check_in < iso && b.check_out > iso);
+  }
+
+  function isCheckIn(date: Date): boolean {
+    const iso = toISO(date);
+    return bookings.some((b) => b.check_in === iso);
+  }
+
+  function isCheckOut(date: Date): boolean {
+    const iso = toISO(date);
+    return bookings.some((b) => b.check_out === iso);
   }
 
   function getDaysInMonth(y: number, m: number) {
@@ -139,26 +152,49 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
           const day = i + 1;
           const date = new Date(year, month, day);
           const booked = isBooked(date);
+          const checkIn = isCheckIn(date);
+          const checkOut = isCheckOut(date);
           const periodIdx = getPeriodIndex(date);
           const dayPrice = getDayPrice(date);
           const isToday = date.toDateString() === today.toDateString();
           const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
+          const freeBg = periodIdx >= 0 ? SEASON_BG_HEX[Math.min(periodIdx, SEASON_BG_HEX.length - 1)] : FREE_BG_HEX;
+
+          // Hintergrund: Abreisetag = links rot, rechts frei; Anreisetag = links frei, rechts rot
+          const splitStyle: React.CSSProperties =
+            checkOut && checkIn
+              ? { background: `linear-gradient(to right, ${BOOKED_BG_HEX} 50%, ${BOOKED_BG_HEX} 50%)` }
+              : checkOut
+              ? { background: `linear-gradient(to right, ${BOOKED_BG_HEX} 50%, ${freeBg} 50%)` }
+              : checkIn
+              ? { background: `linear-gradient(to right, ${freeBg} 50%, ${BOOKED_BG_HEX} 50%)` }
+              : {};
+
+          const isSplit = (checkOut || checkIn) && !booked;
+
           return (
             <div
               key={day}
+              style={isSplit ? splitStyle : undefined}
               className={`relative flex flex-col items-center justify-center rounded-lg py-1.5 transition
                 ${booked
                   ? "bg-red-500 text-white shadow-sm"
+                  : isSplit
+                  ? "text-[#1f1c19]"
                   : periodIdx >= 0
                   ? SEASON_COLORS[periodIdx]
                   : isPast ? "text-stone-200" : "text-stone-300"}
                 ${isToday ? "ring-2 ring-[#66735f] ring-offset-1" : ""}
               `}
             >
-              <span className={`text-sm font-bold leading-none ${isPast && !booked ? "opacity-40" : ""} ${booked ? "line-through opacity-80" : ""}`}>{day}</span>
+              <span className={`text-sm font-bold leading-none ${isPast && !booked && !isSplit ? "opacity-40" : ""} ${booked ? "line-through opacity-80" : ""}`}>{day}</span>
               {booked ? (
                 <span className="mt-0.5 text-[10px] font-semibold leading-none text-red-100">Belegt</span>
+              ) : isSplit ? (
+                <span className="mt-0.5 text-[10px] font-semibold leading-none text-red-500">
+                  {checkOut && checkIn ? "An/Ab" : checkOut ? "Abreise" : "Anreise"}
+                </span>
               ) : dayPrice ? (
                 <span className="mt-0.5 text-[11px] leading-none opacity-70">{dayPrice}</span>
               ) : null}
