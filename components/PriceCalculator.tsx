@@ -95,7 +95,7 @@ const CHILD_AGE_OPTIONS = Array.from({ length: 18 }, (_, i) => i); // 0–17
 
 type Booking = { check_in: string; check_out: string };
 
-export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults = 4, maxChildren, maxToddlerAge = 3 }: Props) {
+export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults = 4, maxChildren, maxToddlerAge = 4 }: Props) {
   const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
 
