@@ -157,12 +157,13 @@ export default function AdminPreise({ slug }: { slug: string }) {
           </div>
         )}
 
+        {copyMsg && <p className={`mt-3 text-sm font-medium ${copyMsg.startsWith("✓") ? "text-[#66735f]" : "text-red-500"}`}>{copyMsg}</p>}
+
         {loading ? (
           <p className="mt-4 text-sm text-stone-400">Laden…</p>
         ) : prices.length === 0 ? (
           <p className="mt-4 text-sm text-stone-400">Noch keine Preiszeiträume eingetragen.</p>
         ) : (
-          {copyMsg && <p className={`mt-3 text-sm font-medium ${copyMsg.startsWith("✓") ? "text-[#66735f]" : "text-red-500"}`}>{copyMsg}</p>}
           <div className="mt-4 space-y-2">
             {prices.map((p) => (
               <div key={p.id} className="flex items-center justify-between rounded-2xl bg-[#f7f3ec] px-5 py-3.5">
