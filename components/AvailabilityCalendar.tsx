@@ -161,14 +161,14 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
 
           const freeBg = periodIdx >= 0 ? SEASON_BG_HEX[Math.min(periodIdx, SEASON_BG_HEX.length - 1)] : FREE_BG_HEX;
 
-          // Hintergrund: Abreisetag = links rot, rechts frei; Anreisetag = links frei, rechts rot
+          // Diagonal: Abreisetag = oben-links rot / unten-rechts frei; Anreisetag = oben-links frei / unten-rechts rot
           const splitStyle: React.CSSProperties =
             checkOut && checkIn
-              ? { background: `linear-gradient(to right, ${BOOKED_BG_HEX} 50%, ${BOOKED_BG_HEX} 50%)` }
+              ? { background: BOOKED_BG_HEX }
               : checkOut
-              ? { background: `linear-gradient(to right, ${BOOKED_BG_HEX} 50%, ${freeBg} 50%)` }
+              ? { background: `linear-gradient(to bottom right, ${BOOKED_BG_HEX} 50%, ${freeBg} 50%)` }
               : checkIn
-              ? { background: `linear-gradient(to right, ${freeBg} 50%, ${BOOKED_BG_HEX} 50%)` }
+              ? { background: `linear-gradient(to bottom right, ${freeBg} 50%, ${BOOKED_BG_HEX} 50%)` }
               : {};
 
           const isSplit = (checkOut || checkIn) && !booked;
@@ -188,11 +188,11 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
                 ${isToday ? "ring-2 ring-[#66735f] ring-offset-1" : ""}
               `}
             >
-              <span className={`text-sm font-bold leading-none ${isPast && !booked && !isSplit ? "opacity-40" : ""} ${booked ? "line-through opacity-80" : ""}`}>{day}</span>
+              <span className={`text-sm font-bold leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] ${isPast && !booked && !isSplit ? "opacity-40" : ""} ${booked ? "line-through opacity-80" : ""} ${isSplit ? "text-white" : ""}`}>{day}</span>
               {booked ? (
                 <span className="mt-0.5 text-[10px] font-semibold leading-none text-red-100">Belegt</span>
               ) : isSplit ? (
-                <span className="mt-0.5 text-[10px] font-semibold leading-none text-red-500">
+                <span className="mt-0.5 text-[10px] font-bold leading-none text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">
                   {checkOut && checkIn ? "An/Ab" : checkOut ? "Abreise" : "Anreise"}
                 </span>
               ) : dayPrice ? (
