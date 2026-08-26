@@ -15,6 +15,7 @@ type Props = {
   prices: PricePeriod[];
   finalCleaning?: string;
   maxAdults?: number;
+  maxChildren?: number;
   maxToddlerAge?: number;
 };
 
@@ -90,7 +91,7 @@ const CHILD_AGE_OPTIONS = Array.from({ length: 18 }, (_, i) => i); // 0–17
 
 type Booking = { check_in: string; check_out: string };
 
-export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults = 4, maxToddlerAge = 3 }: Props) {
+export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults = 4, maxChildren, maxToddlerAge = 3 }: Props) {
   const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
 
@@ -137,8 +138,8 @@ export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults
     totalPersons === MAX_PERSONS && childAges.length > 0 && !childAges.some((a) => a <= maxToddlerAge);
 
   function addChild() {
-    if (totalPersons < MAX_PERSONS) {
-      // 5. Person: Kind muss ≤ 3 sein → Standardalter 0
+    const childLimit = maxChildren ?? MAX_PERSONS;
+    if (totalPersons < MAX_PERSONS && childAges.length < childLimit) {
       const defaultAge = totalPersons === MAX_PERSONS - 1 ? 0 : 5;
       setChildAges((prev) => [...prev, defaultAge]);
     }
@@ -259,7 +260,7 @@ export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults
             value={childAges.length}
             onInc={addChild}
             onDec={removeChild}
-            disableInc={totalPersons >= MAX_PERSONS}
+            disableInc={totalPersons >= MAX_PERSONS || (maxChildren !== undefined && childAges.length >= maxChildren)}
           />
         </div>
 
@@ -290,10 +291,19 @@ export default function PriceCalculator({ slug, prices, finalCleaning, maxAdults
         )}
 
         {totalPersons >= MAX_PERSONS && !fivePersonViolation && (
-          <p className="mt-1.5 text-xs text-amber-600 font-medium">Ab 5 Personen: +10,00 € Aufschlag pro Nacht (5. Person muss Kind bis {maxToddlerAge} Jahre sein)</p>
+          <p className="mt-1.5 text-xs text-amber-600 font-medium">
+            Ab 5 Personen: +10,00 € Aufschlag pro Nacht
+            {maxChildren !== undefined
+              ? ` (2. Kind muss bis ${maxToddlerAge} Jahre sein)`
+              : ` (5. Person muss Kind bis ${maxToddlerAge} Jahre sein)`}
+          </p>
         )}
         {fivePersonViolation && (
-          <p className="mt-1.5 text-xs text-red-600 font-medium">Bei 5 Personen muss mindestens ein Kind bis {maxToddlerAge} Jahre sein.</p>
+          <p className="mt-1.5 text-xs text-red-600 font-medium">
+            {maxChildren !== undefined
+              ? `Bei 2 Kindern muss mindestens eines bis ${maxToddlerAge} Jahre alt sein.`
+              : `Bei 5 Personen muss mindestens ein Kind bis ${maxToddlerAge} Jahre sein.`}
+          </p>
         )}
       </div>
 
