@@ -84,7 +84,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
     { icon: "🏠", label: `${size} m²` },
     { icon: "👨‍👩‍👧", label: guests },
     { icon: "🏖️", label: "5 km Strand" },
-    { icon: "🐾", label: pets },
+    { icon: "🚫", label: pets },
   ];
 
   return (
