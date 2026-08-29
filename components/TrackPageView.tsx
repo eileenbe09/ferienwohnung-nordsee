@@ -8,12 +8,18 @@ export default function TrackPageView() {
 
   useEffect(() => {
     if (pathname.startsWith("/admin")) return;
+    try {
+      if (sessionStorage.getItem("tracked")) return;
+      sessionStorage.setItem("tracked", "1");
+    } catch {
+      return;
+    }
     fetch("/api/track", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ path: pathname }),
     }).catch(() => {});
-  }, [pathname]);
+  }, []);
 
   return null;
 }

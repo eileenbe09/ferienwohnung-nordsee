@@ -54,9 +54,9 @@ export default function AdminStats() {
       {/* Kennzahlen */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: "Heute", value: today },
-          { label: "Diese Woche", value: week },
-          { label: "Gesamt", value: total },
+          { label: "Besucher heute", value: today },
+          { label: "Besucher diese Woche", value: week },
+          { label: "Besucher gesamt", value: total },
         ].map(({ label, value }) => (
           <div key={label} className="rounded-2xl bg-white p-5 shadow-sm text-center">
             <p className="text-3xl font-bold text-[#1f1c19]">{value.toLocaleString("de-DE")}</p>
@@ -67,7 +67,7 @@ export default function AdminStats() {
 
       {/* Top-Seiten */}
       <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="font-serif text-xl text-[#1f1c19]">Meist besuchte Seiten</h2>
+        <h2 className="font-serif text-xl text-[#1f1c19]">Einstiegsseiten</h2>
         <div className="mt-4 space-y-2">
           {topPages.map(([path, count]) => {
             const pct = total > 0 ? Math.round((count / total) * 100) : 0;
@@ -92,7 +92,7 @@ export default function AdminStats() {
         </div>
       </div>
 
-      <p className="text-xs text-stone-400">* Admin-Besuche werden nicht gezählt. Daten aus Supabase.</p>
+      <p className="text-xs text-stone-400">* Jeder Besucher wird nur einmal gezählt (pro Browser-Sitzung). Admin-Besuche werden nicht erfasst.</p>
     </div>
   );
 }
