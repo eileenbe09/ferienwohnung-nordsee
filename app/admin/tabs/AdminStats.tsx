@@ -22,7 +22,7 @@ export default function AdminStats() {
   useEffect(() => {
     supabase
       .from("page_views")
-      .select("path, created_at")
+      .select("path, created_at, is_visitor")
       .order("created_at", { ascending: false })
       .limit(5000)
       .then(({ data }) => {
