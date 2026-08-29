@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -40,8 +41,18 @@ export default function Footer() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
               Kontakt
             </p>
-            <ul className="mt-4 space-y-2.5 text-sm text-stone-400">
-              <li>Manuela Lojdl</li>
+            <div className="mt-4 flex items-center gap-3">
+              <Image
+                src="/images/Manuela.jpeg"
+                alt="Manuela Lojdl"
+                width={56}
+                height={56}
+                className="rounded-full object-cover shrink-0"
+                style={{ width: 56, height: 56 }}
+              />
+              <span className="text-sm text-stone-300 font-medium">Manuela Lojdl</span>
+            </div>
+            <ul className="mt-3 space-y-2.5 text-sm text-stone-400">
               <li>Smittshörn 16, 26409 Wittmund</li>
               <li>
                 <a
