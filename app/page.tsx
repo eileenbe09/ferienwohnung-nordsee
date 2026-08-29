@@ -377,7 +377,7 @@ export default async function Home() {
               Bereit für Urlaub?
             </p>
             <h2 className="mt-3 font-serif text-4xl italic sm:text-5xl lg:text-6xl">
-              Dein nächster Sommer<br />
+              Dein nächster Urlaub<br />
               <span className="not-italic font-semibold">wartet auf dich.</span>
             </h2>
             <p className="mt-5 max-w-lg leading-7 text-white/80">
