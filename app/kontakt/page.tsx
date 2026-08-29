@@ -26,7 +26,7 @@ export default function KontaktPage() {
               {
                 icon: "📍",
                 title: "Adresse",
-                lines: ["Smittshörn 16", "26409 Wittmund"],
+                lines: ["Manuela Lojdl", "Smittshörn 16", "26409 Wittmund"],
               },
               {
                 icon: "✉️",
