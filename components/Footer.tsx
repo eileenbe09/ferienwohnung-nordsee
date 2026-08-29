@@ -41,7 +41,7 @@ export default function Footer() {
               Kontakt
             </p>
             <ul className="mt-4 space-y-2.5 text-sm text-stone-400">
-              <li>Vermieterin: Manuela Lojdl</li>
+              <li>Manuela Lojdl</li>
               <li>Smittshörn 16, 26409 Wittmund</li>
               <li>
                 <a
