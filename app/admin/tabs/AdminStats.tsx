@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase-browser";
 
-type Row = { path: string; created_at: string };
+type Row = { path: string; created_at: string; is_visitor: boolean };
 
 const PAGE_LABELS: Record<string, string> = {
   "/": "Startseite",
@@ -35,14 +35,17 @@ export default function AdminStats() {
   const todayStr = now.toISOString().split("T")[0];
   const weekAgo = new Date(now.getTime() - 7 * 86400000).toISOString();
 
-  const total = rows.length;
-  const today = rows.filter((r) => r.created_at.startsWith(todayStr)).length;
-  const week = rows.filter((r) => r.created_at >= weekAgo).length;
+  const visitors = rows.filter((r) => r.is_visitor);
+  const total = visitors.length;
+  const today = visitors.filter((r) => r.created_at.startsWith(todayStr)).length;
+  const week = visitors.filter((r) => r.created_at >= weekAgo).length;
 
+  // Seitenaufrufe (alle Zeilen, nicht nur Erstbesuche)
   const pageCounts: Record<string, number> = {};
   rows.forEach((r) => {
     pageCounts[r.path] = (pageCounts[r.path] ?? 0) + 1;
   });
+  const totalPageViews = rows.length;
   const topPages = Object.entries(pageCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6);
@@ -52,11 +55,12 @@ export default function AdminStats() {
   return (
     <div className="space-y-5">
       {/* Kennzahlen */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
           { label: "Besucher heute", value: today },
           { label: "Besucher diese Woche", value: week },
           { label: "Besucher gesamt", value: total },
+          { label: "Seitenaufrufe gesamt", value: totalPageViews },
         ].map(({ label, value }) => (
           <div key={label} className="rounded-2xl bg-white p-5 shadow-sm text-center">
             <p className="text-3xl font-bold text-[#1f1c19]">{value.toLocaleString("de-DE")}</p>
@@ -67,10 +71,10 @@ export default function AdminStats() {
 
       {/* Top-Seiten */}
       <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="font-serif text-xl text-[#1f1c19]">Einstiegsseiten</h2>
+        <h2 className="font-serif text-xl text-[#1f1c19]">Meist besuchte Seiten</h2>
         <div className="mt-4 space-y-2">
           {topPages.map(([path, count]) => {
-            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const pct = totalPageViews > 0 ? Math.round((count / totalPageViews) * 100) : 0;
             return (
               <div key={path}>
                 <div className="flex items-center justify-between text-sm mb-1">
