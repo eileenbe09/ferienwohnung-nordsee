@@ -35,7 +35,7 @@ export default async function AnfragePage({ searchParams }: PageProps) {
                 {
                   icon: "📍",
                   title: "Adresse",
-                  text: "Smittshörn 16\n26409 Wittmund",
+                  text: "Manuela Lojdl\nSmittshörn 16\n26409 Wittmund",
                 },
                 {
                   icon: "✉️",
