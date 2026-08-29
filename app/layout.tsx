@@ -20,7 +20,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Ferienwohnungen Lojdl · Nordsee",
   description:
-    "Urlaub an der Nordsee in Altfunnixsiel – zwei gemütliche Ferienwohnungen direkt bei Familie Lojdl. Ruhige Lage, ca. 5 km zum Strand. Jetzt anfragen!",
+    "Urlaub an der Nordsee in Altfunnixsiel – zwei gemütliche Ferienwohnungen in ruhiger Lage, ca. 5 km zum Strand. Jetzt anfragen!",
   icons: {
     icon: "/favicon.svg",
   },
