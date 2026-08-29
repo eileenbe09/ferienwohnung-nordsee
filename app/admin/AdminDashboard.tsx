@@ -8,6 +8,7 @@ import AdminTexte from "./tabs/AdminTexte";
 import AdminPreise from "./tabs/AdminPreise";
 import AdminAusstattung from "./tabs/AdminAusstattung";
 import AdminBilder from "./tabs/AdminBilder";
+import AdminStats from "./tabs/AdminStats";
 
 type Booking = {
   id: string;
@@ -25,6 +26,7 @@ const TABS = [
   { id: "preise", label: "💶 Preise" },
   { id: "ausstattung", label: "✓ Ausstattung" },
   { id: "bilder", label: "🖼 Bilder" },
+  { id: "statistiken", label: "📊 Besucher" },
 ];
 
 const FALLBACK_APARTMENTS: Apartment[] = [
@@ -223,6 +225,7 @@ export default function AdminDashboard({ bookings: initial }: { bookings: Bookin
           {activeTab === "preise" && <AdminPreise slug={activeApt} />}
           {activeTab === "ausstattung" && <AdminAusstattung slug={activeApt} />}
           {activeTab === "bilder" && <AdminBilder slug={activeApt} />}
+          {activeTab === "statistiken" && <AdminStats />}
         </div>
       </div>
     </div>
