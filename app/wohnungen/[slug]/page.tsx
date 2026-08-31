@@ -55,14 +55,21 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
       : (staticApt?.features ?? []).map((label, i) => ({ id: i, label }));
 
   // Preise: Supabase-Daten (from_date/to_date/price_per_night) haben Vorrang
+  function toISO(s: string) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    const [d, m, y] = s.split(".");
+    return `${y}-${m}-${d}`;
+  }
   type PricePeriod = { from: string; to: string; price: string };
   const calendarPrices: PricePeriod[] =
     dbPrices && dbPrices.length > 0
-      ? dbPrices.map((p: { from_date: string; to_date: string; price_per_night: number }) => ({
-          from: p.from_date,
-          to: p.to_date,
-          price: `${p.price_per_night},00 € / Nacht`,
-        }))
+      ? [...dbPrices]
+          .sort((a, b) => toISO(a.from_date).localeCompare(toISO(b.from_date)))
+          .map((p: { from_date: string; to_date: string; price_per_night: number }) => ({
+            from: p.from_date,
+            to: p.to_date,
+            price: `${p.price_per_night},00 € / Nacht`,
+          }))
       : staticApt?.prices ?? [];
 
   const isRenovating = apartment?.is_renovating ?? false;
@@ -206,7 +213,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                             }
                             return s;
                           };
-                          const priceNum = parseInt(p.price.replace(/\D/g, ""));
+                          const priceNum = parseInt(p.price);
                           return (
                             <tr key={i} className={`border-b border-stone-50 ${i % 2 === 0 ? "" : "bg-[#f7f3ec]/40"}`}>
                               <td className="px-5 py-3 text-stone-700">{fmt(p.from)} – {fmt(p.to)}</td>
