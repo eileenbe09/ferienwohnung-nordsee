@@ -186,6 +186,41 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
+              {/* Preisübersicht */}
+              {calendarPrices.length > 0 && (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Preisübersicht</p>
+                  <div className="mt-4 overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-stone-100 bg-[#f7f3ec]">
+                          <th className="px-5 py-3 text-left font-semibold text-stone-600">Zeitraum</th>
+                          <th className="px-5 py-3 text-right font-semibold text-stone-600">Preis / Nacht</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {calendarPrices.map((p, i) => {
+                          const fmt = (s: string) => {
+                            if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+                              const [y, m, d] = s.split("-"); return `${d}.${m}.${y}`;
+                            }
+                            return s;
+                          };
+                          const priceNum = parseInt(p.price.replace(/\D/g, ""));
+                          return (
+                            <tr key={i} className={`border-b border-stone-50 ${i % 2 === 0 ? "" : "bg-[#f7f3ec]/40"}`}>
+                              <td className="px-5 py-3 text-stone-700">{fmt(p.from)} – {fmt(p.to)}</td>
+                              <td className="px-5 py-3 text-right font-semibold text-[#1f1c19]">{priceNum} €</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    <p className="px-5 py-3 text-xs text-stone-400">Endreinigung einmalig {finalCleaning.replace(" einmalig", "")} · Bettwäsche & Handtücher optional zubuchbar</p>
+                  </div>
+                </div>
+              )}
+
               {/* Kalender mit Belegung */}
               {calendarPrices.length > 0 && (
                 <div>
