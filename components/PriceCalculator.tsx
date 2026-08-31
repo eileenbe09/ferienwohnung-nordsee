@@ -41,7 +41,7 @@ function getPriceForDate(date: Date, periods: PricePeriod[]): number {
   for (const p of periods) {
     const from = parseDE(p.from);
     const to = parseDE(p.to);
-    if (date >= from && date < to) return parsePriceNum(p.price);
+    if (date >= from && date <= to) return parsePriceNum(p.price);
   }
   return 0;
 }

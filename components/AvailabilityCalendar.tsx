@@ -76,7 +76,7 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
 
   function getPeriodIndex(date: Date): number {
     for (let i = 0; i < periods.length; i++) {
-      if (date >= periods[i].from && date < periods[i].to) {
+      if (date >= periods[i].from && date <= periods[i].to) {
         const priceIdx = uniquePrices.indexOf(periods[i].price);
         return Math.min(priceIdx, SEASON_COLORS.length - 1);
       }
@@ -86,7 +86,7 @@ export default function AvailabilityCalendar({ prices, slug }: Props) {
 
   function getDayPrice(date: Date): string | null {
     for (let i = 0; i < periods.length; i++) {
-      if (date >= periods[i].from && date < periods[i].to) {
+      if (date >= periods[i].from && date <= periods[i].to) {
         const match = periods[i].price.match(/(\d+)/);
         return match ? `${match[1]} €` : null;
       }
