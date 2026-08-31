@@ -5,6 +5,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import TrackPageView from "@/components/TrackPageView";
+import { Analytics } from "@vercel/analytics/next";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
         <Footer />
         <CookieBanner />
         <TrackPageView />
+        <Analytics />
       </body>
     </html>
   );
