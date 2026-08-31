@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Playfair_Display } from "next/font/google";
@@ -36,6 +37,7 @@ export default function RootLayout({
         <Footer />
         <CookieBanner />
         <TrackPageView />
+        <Analytics />
       </body>
     </html>
   );
