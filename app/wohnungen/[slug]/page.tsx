@@ -249,7 +249,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                       finalCleaning={finalCleaning}
                       maxAdults={slug === "leuchtturm" ? 3 : 4}
                       maxChildren={slug === "leuchtturm" ? 2 : undefined}
-                      maxToddlerAge={slug === "leuchtturm" ? 4 : 3}
+                      maxToddlerAge={4}
                     />
                   </div>
                 </div>
