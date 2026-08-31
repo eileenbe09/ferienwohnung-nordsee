@@ -50,6 +50,10 @@ export default function AdminPreise({ slug }: { slug: string }) {
   const [priceFinalCleaning, setPriceFinalCleaning] = useState<number>(75);
   const [extraMsg, setExtraMsg] = useState("");
   const [copyMsg, setCopyMsg] = useState("");
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editFrom, setEditFrom] = useState("");
+  const [editTo, setEditTo] = useState("");
+  const [editPrice, setEditPrice] = useState("");
 
   useEffect(() => { load(); }, [slug]);
 
@@ -97,6 +101,30 @@ export default function AdminPreise({ slug }: { slug: string }) {
   }
 
   function flash(text: string) { setMsg(text); setTimeout(() => setMsg(""), 3000); }
+
+  function startEdit(p: PricePeriod) {
+    setEditId(p.id);
+    setEditFrom(deToISO(p.from_date));
+    setEditTo(deToISO(p.to_date));
+    setEditPrice(String(p.price_per_night));
+  }
+
+  async function handleSaveEdit() {
+    if (!editId || !editFrom || !editTo || !editPrice) return;
+    const { error } = await supabase.from("apartment_prices").update({
+      from_date: isoToDE(editFrom),
+      to_date: isoToDE(editTo),
+      price_per_night: parseInt(editPrice),
+    }).eq("id", editId);
+    if (!error) {
+      setPrices((prev) => prev.map((p) => p.id === editId
+        ? { ...p, from_date: isoToDE(editFrom), to_date: isoToDE(editTo), price_per_night: parseInt(editPrice) }
+        : p
+      ));
+      setEditId(null);
+      flash("✓ Zeitraum aktualisiert.");
+    } else flash("Fehler beim Speichern.");
+  }
 
   async function handleSaveExtras() {
     if (!aptId) return;
@@ -166,24 +194,51 @@ export default function AdminPreise({ slug }: { slug: string }) {
         ) : (
           <div className="mt-4 space-y-2">
             {prices.map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded-2xl bg-[#f7f3ec] px-5 py-3.5">
-                <div>
-                  <p className="text-sm font-semibold text-[#1f1c19]">
-                    {formatDateDE(p.from_date)} – {formatDateDE(p.to_date)}
-                  </p>
-                  <p className="text-sm text-stone-500">{p.price_per_night} € / Nacht</p>
-                </div>
-                {!p.id.startsWith("static") && (
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => handleCopyPeriodToAll(p)}
-                      className="rounded-full border border-[#66735f]/40 px-3 py-1 text-xs text-[#66735f] transition hover:bg-[#66735f]/10"
-                      title="Diesen Zeitraum auf alle Wohnungen übertragen">
-                      Für alle
+              <div key={p.id} className="rounded-2xl bg-[#f7f3ec] px-5 py-3.5">
+                {editId === p.id ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input type="date" value={editFrom} onChange={(e) => setEditFrom(e.target.value)}
+                      className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#66735f]" />
+                    <span className="text-stone-400">–</span>
+                    <input type="date" value={editTo} onChange={(e) => setEditTo(e.target.value)}
+                      className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#66735f]" />
+                    <input type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)}
+                      className="w-24 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#66735f]"
+                      placeholder="€/Nacht" />
+                    <button onClick={handleSaveEdit}
+                      className="rounded-full bg-[#1f1c19] px-3 py-1 text-xs font-semibold text-white transition hover:bg-[#66735f]">
+                      Speichern
                     </button>
-                    <button onClick={() => handleDelete(p.id)}
-                      className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-400 transition hover:bg-red-50 hover:text-red-600">
-                      Löschen
+                    <button onClick={() => setEditId(null)}
+                      className="rounded-full border border-stone-200 px-3 py-1 text-xs text-stone-400 transition hover:bg-stone-100">
+                      Abbrechen
                     </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-[#1f1c19]">
+                        {formatDateDE(p.from_date)} – {formatDateDE(p.to_date)}
+                      </p>
+                      <p className="text-sm text-stone-500">{p.price_per_night} € / Nacht</p>
+                    </div>
+                    {!p.id.startsWith("static") && (
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => startEdit(p)}
+                          className="rounded-full border border-stone-300 px-3 py-1 text-xs text-stone-500 transition hover:bg-stone-100">
+                          Bearbeiten
+                        </button>
+                        <button onClick={() => handleCopyPeriodToAll(p)}
+                          className="rounded-full border border-[#66735f]/40 px-3 py-1 text-xs text-[#66735f] transition hover:bg-[#66735f]/10"
+                          title="Diesen Zeitraum auf alle Wohnungen übertragen">
+                          Für alle
+                        </button>
+                        <button onClick={() => handleDelete(p.id)}
+                          className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-400 transition hover:bg-red-50 hover:text-red-600">
+                          Löschen
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
