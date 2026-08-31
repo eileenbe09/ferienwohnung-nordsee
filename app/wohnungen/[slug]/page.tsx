@@ -193,6 +193,16 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
+              {/* Kalender mit Belegung */}
+              {calendarPrices.length > 0 && (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Verfügbarkeit</p>
+                  <div className="mt-4">
+                    <AvailabilityCalendar prices={calendarPrices} slug={slug} />
+                  </div>
+                </div>
+              )}
+
               {/* Preisübersicht */}
               {calendarPrices.length > 0 && (
                 <div>
@@ -224,16 +234,6 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
                       </tbody>
                     </table>
                     <p className="px-5 py-3 text-xs text-stone-400">Endreinigung einmalig {finalCleaning.replace(" einmalig", "")} · Bettwäsche & Handtücher optional zubuchbar</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Kalender mit Belegung */}
-              {calendarPrices.length > 0 && (
-                <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-[#66735f]">Verfügbarkeit</p>
-                  <div className="mt-4">
-                    <AvailabilityCalendar prices={calendarPrices} slug={slug} />
                   </div>
                 </div>
               )}
