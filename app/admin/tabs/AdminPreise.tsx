@@ -65,8 +65,9 @@ export default function AdminPreise({ slug }: { slug: string }) {
       setPriceBedding(apt.price_bedding ?? 9);
       setPriceTowels(apt.price_towels ?? 5);
       setPriceFinalCleaning(apt.price_final_cleaning ?? 75);
-      const { data } = await supabase.from("apartment_prices").select("*").eq("apartment_id", apt.id).order("from_date");
-      setPrices((data ?? []) as PricePeriod[]);
+      const { data } = await supabase.from("apartment_prices").select("*").eq("apartment_id", apt.id);
+      const sorted = ((data ?? []) as PricePeriod[]).sort((a, b) => deToISO(a.from_date).localeCompare(deToISO(b.from_date)));
+      setPrices(sorted);
     } else {
       // Show static prices read-only
       setPrices(
