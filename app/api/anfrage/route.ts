@@ -10,6 +10,19 @@ export async function POST(req: NextRequest) {
     berechneter_preis, bettwaesche_paket, handtuch_paket, kinderalter,
   } = body;
 
+  // Serverseitige Validierung
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  if (!email || !emailRegex.test(email)) {
+    return NextResponse.json({ ok: false, error: "Ungültige E-Mail-Adresse." }, { status: 400 });
+  }
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  if (anreise && new Date(anreise) < today) {
+    return NextResponse.json({ ok: false, error: "Anreisedatum liegt in der Vergangenheit." }, { status: 400 });
+  }
+  if (abreise && new Date(abreise) < today) {
+    return NextResponse.json({ ok: false, error: "Abreisedatum liegt in der Vergangenheit." }, { status: 400 });
+  }
+
   const transporter = nodemailer.createTransport({
     host: "smtp.strato.de",
     port: 465,

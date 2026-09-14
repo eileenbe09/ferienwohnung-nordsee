@@ -22,6 +22,7 @@ const WOHNUNG_MAP: Record<string, string> = {
 export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kinder, kinderalter, bettwaesche, handtuch, preis }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const today = new Date().toISOString().split("T")[0];
 
   const wohnungLabel = wohnung ? (WOHNUNG_MAP[wohnung.toLowerCase()] ?? wohnung) : "";
 
@@ -115,6 +116,8 @@ export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kin
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">E-Mail *</label>
             <input name="email" required type="email"
+              pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+              title="Bitte gib eine gültige E-Mail-Adresse ein (z. B. name@beispiel.de)"
               className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
           </div>
           <div>
@@ -138,12 +141,12 @@ export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kin
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Anreise *</label>
-            <input name="anreise" required type="date" defaultValue={anreise}
+            <input name="anreise" required type="date" defaultValue={anreise} min={today}
               className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
           </div>
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Abreise *</label>
-            <input name="abreise" required type="date" defaultValue={abreise}
+            <input name="abreise" required type="date" defaultValue={abreise} min={today}
               className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
           </div>
         </div>
