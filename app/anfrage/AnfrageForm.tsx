@@ -22,6 +22,7 @@ const WOHNUNG_MAP: Record<string, string> = {
 export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kinder, kinderalter, bettwaesche, handtuch, preis }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [emailError, setEmailError] = useState("");
   const today = new Date().toISOString().split("T")[0];
 
   const wohnungLabel = wohnung ? (WOHNUNG_MAP[wohnung.toLowerCase()] ?? wohnung) : "";
@@ -77,6 +78,17 @@ export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kin
           e.preventDefault();
           const form = formRef.current!;
           const data = Object.fromEntries(new FormData(form).entries());
+
+          // Honeypot: wenn dieses Feld ausgefüllt ist → Bot
+          if (data.website) return;
+
+          // E-Mail-Bestätigung prüfen
+          if (data.email !== data.email_confirm) {
+            setEmailError("Die E-Mail-Adressen stimmen nicht überein.");
+            return;
+          }
+          setEmailError("");
+
           setStatus("sending");
           try {
             const res = await fetch("/api/anfrage", {
@@ -92,6 +104,10 @@ export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kin
           }
         }}
       >
+        {/* Honeypot – für Menschen unsichtbar, Bots füllen es aus */}
+        <input name="website" type="text" autoComplete="off" tabIndex={-1}
+          style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }} />
+
         {/* Versteckte Felder mit Buchungsdetails */}
         {wohnung && <input type="hidden" name="wohnung_slug" value={wohnung} />}
         {preis && <input type="hidden" name="berechneter_preis" value={preis} />}
@@ -120,6 +136,17 @@ export default function AnfrageForm({ wohnung, anreise, abreise, erwachsene, kin
               title="Bitte gib eine gültige E-Mail-Adresse ein (z. B. name@beispiel.de)"
               className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
           </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">E-Mail bestätigen *</label>
+            <input name="email_confirm" required type="email"
+              autoComplete="off"
+              pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+              className="w-full rounded-xl border border-stone-200 bg-[#f7f3ec] px-4 py-3 text-sm text-[#1f1c19] outline-none focus:border-[#66735f] focus:ring-2 focus:ring-[#66735f]/20 transition" />
+            {emailError && <p className="mt-1 text-xs text-red-500">{emailError}</p>}
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Telefon</label>
             <input name="telefon" type="tel"
